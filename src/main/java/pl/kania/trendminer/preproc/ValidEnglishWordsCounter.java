@@ -2,7 +2,7 @@ package pl.kania.trendminer.preproc;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import pl.kania.trendminer.model.Tweet;
+import pl.kania.trendminer.input.Tweet;
 
 import java.util.List;
 

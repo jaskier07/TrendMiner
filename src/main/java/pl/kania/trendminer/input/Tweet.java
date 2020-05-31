@@ -1,4 +1,4 @@
-package pl.kania.trendminer.model;
+package pl.kania.trendminer.input;
 
 import lombok.Data;
 import pl.kania.trendminer.preproc.TweetContentTokenizer;

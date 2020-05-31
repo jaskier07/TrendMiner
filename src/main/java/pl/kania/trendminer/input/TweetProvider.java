@@ -1,14 +1,11 @@
 package pl.kania.trendminer.input;
 
-import pl.kania.trendminer.model.Tweet;
 import pl.kania.trendminer.parser.OpenNlpProvider;
 import pl.kania.trendminer.preproc.TweetContentTokenizer;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class TweetProvider {
 
@@ -42,6 +39,7 @@ public class TweetProvider {
     }
 
     private Tweet getExampleTweet2() {
-        return new Tweet(String.valueOf(counter), "en", "Author" + counter, "Poland", "Rupert Murdoch attacked in Parliament during testimony.", LocalDateTime.now());
+        return new Tweet(String.valueOf(counter), "en", "Author" + counter, "Poland",
+                "Rupert Murdoch attacked in Parliament during testimony. Rupert is alright now.", LocalDateTime.now());
     }
 }
