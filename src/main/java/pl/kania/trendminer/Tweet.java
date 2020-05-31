@@ -1,11 +1,13 @@
-package pl.kania.trendminer.input;
+package pl.kania.trendminer;
 
 import lombok.Data;
 import pl.kania.trendminer.preproc.TweetContentTokenizer;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Data
 public class Tweet {
@@ -16,7 +18,7 @@ public class Tweet {
     private String content;
     private LocalDateTime createdAt;
     private List<String> words;
-    private List<String> preprocessedWords = new ArrayList<>();
+    private Set<String> stemmedWords = new HashSet<>();
 
     public Tweet(String id, String lang, String author, String location, String content, LocalDateTime createdAt) {
         this.id = id;

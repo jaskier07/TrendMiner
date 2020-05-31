@@ -37,6 +37,7 @@ public class OpenNlpProvider {
         List<String> preservedWords = new ArrayList<>();
 
         for (int i = 0; i < tokens.length; i++) {
+            // TODO!!! remove 's
             if (isNounOrVerb(tags[i])) {
                 preservedWords.add(tokens[i]);
             }

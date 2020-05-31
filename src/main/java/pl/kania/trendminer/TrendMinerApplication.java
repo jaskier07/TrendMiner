@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
-import pl.kania.trendminer.input.Tweet;
 import pl.kania.trendminer.parser.TweetParser;
 import pl.kania.trendminer.preproc.Receiver;
 
@@ -19,7 +18,7 @@ public class TrendMinerApplication {
 		Receiver receiver = applicationContext.getBean(Receiver.class);
 
 		List<Tweet> tweetsInEnglish = receiver.getTweetsInEnglish();
-		new TweetParser().parseWordsFromTweetsAndFillCooccurrenceTable(tweetsInEnglish);
+		applicationContext.getBean(TweetParser.class).parseWordsFromTweetsAndFillCooccurrenceTable(tweetsInEnglish);
 	}
 
 }

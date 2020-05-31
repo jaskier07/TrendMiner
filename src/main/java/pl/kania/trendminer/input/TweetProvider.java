@@ -1,45 +1,29 @@
 package pl.kania.trendminer.input;
 
-import pl.kania.trendminer.parser.OpenNlpProvider;
-import pl.kania.trendminer.preproc.TweetContentTokenizer;
+import pl.kania.trendminer.Tweet;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Random;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class TweetProvider {
 
-    private final List<String> exampleWords;
-    private static int counter = 0;
-
-    public TweetProvider() {
-        exampleWords = TweetContentTokenizer.tokenize("All Twitter APIs that return Tweets provide that data encoded using JavaScript Object Notation (JSON). JSON is based on key-value pairs, with named attributes and associated values. These attributes, and their state are used to describe objects.");
-    }
+    private final static List<String> exampleTweetContents = List.of(
+            "Rupert Murdoch attacked in Parliament during testimony. Rupert is alright now.",
+            "US astronauts Doug Hurley and Bob Behnken have docked with, and entered, the International Space Station (ISS).",
+            "Hurley and Behnken launched from Florida on Saturday.",
+            "Hurley's and Behnken's job on the mission is to test all onboard systems and to give their feedback to engineers.",
+            "Unbelievable!"
+    );
 
     public List<Tweet> getTweets() {
-//        return Stream.generate(this::getExampleTweet).limit(30).collect(Collectors.toList());
-        return List.of(getExampleTweet2());
+        return getExampleTweets();
     }
 
-    private Tweet getExampleTweet() {
-        StringBuilder content = new StringBuilder("Tweet # ");
-        content.append(counter);
-        content.append(' ');
-        new OpenNlpProvider().divideIntoSentences("ELO. Siema! Co?");
-
-        Random random = new Random();
-        for (int i = 0; i < random.nextInt(exampleWords.size()); i++) {
-            content.append(exampleWords.get(random.nextInt(exampleWords.size())));
-            content.append(' ');
-        }
-
-        Tweet tweet = new Tweet(String.valueOf(counter), "en", "Author" + counter, "Poland", content.toString(), LocalDateTime.now());
-        counter++;
-        return tweet;
-    }
-
-    private Tweet getExampleTweet2() {
-        return new Tweet(String.valueOf(counter), "en", "Author" + counter, "Poland",
-                "Rupert Murdoch attacked in Parliament during testimony. Rupert is alright now.", LocalDateTime.now());
+    private List<Tweet> getExampleTweets() {
+        return exampleTweetContents.stream()
+                .map(t -> new Tweet(UUID.randomUUID().toString(), "en", "Author", "Poland", t, LocalDateTime.now()))
+                .collect(Collectors.toList());
     }
 }

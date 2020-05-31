@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.kania.trendminer.input.TweetProvider;
-import pl.kania.trendminer.input.Tweet;
+import pl.kania.trendminer.Tweet;
 
 import java.util.Iterator;
 import java.util.List;
