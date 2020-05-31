@@ -58,7 +58,6 @@ public class TweetParser {
             if (support < SUPPORT_MIN_THRESHOLD) {
                 iterator.remove();
             } else {
-            // FIXME is value rememberred?
                 entry.getKey().setSupport(support);
             }
         }
