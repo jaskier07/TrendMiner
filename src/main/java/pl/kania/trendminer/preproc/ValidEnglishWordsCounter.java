@@ -3,6 +3,7 @@ package pl.kania.trendminer.preproc;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.kania.trendminer.Tweet;
+import pl.kania.trendminer.parser.OpenNlpProvider;
 
 import java.util.List;
 
@@ -10,19 +11,21 @@ import java.util.List;
 public class ValidEnglishWordsCounter {
 
     private Dictionary dictionary;
+    private OpenNlpProvider openNlpProvider;
 
     public ValidEnglishWordsCounter(@Autowired Dictionary dictionary) {
         this.dictionary = dictionary;
+        this.openNlpProvider = new OpenNlpProvider();
     }
 
     public int getPercentageOfEnglishWords(Tweet tweet) {
-        List<String> words = tweet.getWords();
+        List<String> words = TweetContentTokenizer.tokenize(tweet.getContent());
         int englishWordsCount = words.stream()
                 .map(String::toLowerCase)
                 .map(dictionary::isEnglishWord)
                 .map(t -> t ? 1 : 0)
                 .reduce(Integer::sum)
-                .orElseThrow(() -> new IllegalStateException("An error occured while counting english words"));
+                .orElseThrow(() -> new IllegalStateException("An error occurred while counting english words"));
         return englishWordsCount * 100 / words.size();
     }
 }

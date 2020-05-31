@@ -17,7 +17,6 @@ public class Tweet {
     private String location;
     private String content;
     private LocalDateTime createdAt;
-    private List<String> words;
     private Set<String> stemmedWords = new HashSet<>();
 
     public Tweet(String id, String lang, String author, String location, String content, LocalDateTime createdAt) {
@@ -31,13 +30,6 @@ public class Tweet {
 
     @Override
     public String toString() {
-        return "Content: " + getWords().toString() + ", author:" + author;
-    }
-
-    public List<String> getWords() {
-        if (words == null) {
-            words = TweetContentTokenizer.tokenize(content);
-        }
-        return words;
+        return "Content: " + content + ", author:" + author;
     }
 }

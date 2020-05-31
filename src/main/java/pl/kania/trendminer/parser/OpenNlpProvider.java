@@ -1,5 +1,6 @@
 package pl.kania.trendminer.parser;
 
+import antlr.Token;
 import lombok.extern.slf4j.Slf4j;
 import opennlp.tools.postag.POSModel;
 import opennlp.tools.postag.POSTagger;
@@ -8,17 +9,20 @@ import opennlp.tools.sentdetect.SentenceDetectorME;
 import opennlp.tools.sentdetect.SentenceModel;
 import opennlp.tools.stemmer.PorterStemmer;
 import opennlp.tools.stemmer.Stemmer;
+import opennlp.tools.tokenize.Tokenizer;
+import opennlp.tools.tokenize.TokenizerME;
+import opennlp.tools.tokenize.TokenizerModel;
 import pl.kania.trendminer.preproc.TweetContentTokenizer;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
 public class OpenNlpProvider {
 
-    private SentenceModel sentenceModel;
     private SentenceDetectorME sentenceDetector;
     private POSTagger posTagger;
     private Stemmer stemmer;
@@ -37,7 +41,6 @@ public class OpenNlpProvider {
         List<String> preservedWords = new ArrayList<>();
 
         for (int i = 0; i < tokens.length; i++) {
-            // TODO!!! remove 's
             if (isNounOrVerb(tags[i])) {
                 preservedWords.add(tokens[i]);
             }
@@ -64,7 +67,7 @@ public class OpenNlpProvider {
 
     private void initModel() {
         try (InputStream is = getClass().getResourceAsStream("/en-sent.bin")) {
-            sentenceModel = new SentenceModel(is);
+            SentenceModel sentenceModel = new SentenceModel(is);
             sentenceDetector = new SentenceDetectorME(sentenceModel);
         } catch (IOException e) {
             log.error("Cannot load file containing English sentences", e);

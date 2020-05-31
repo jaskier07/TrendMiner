@@ -14,7 +14,8 @@ public class TweetProvider {
             "US astronauts Doug Hurley and Bob Behnken have docked with, and entered, the International Space Station (ISS).",
             "Hurley and Behnken launched from Florida on Saturday.",
             "Hurley's and Behnken's job on the mission is to test all onboard systems and to give their feedback to engineers.",
-            "Unbelievable!"
+            "Unbelievable!",
+            "I'm shocked!"
     );
 
     public List<Tweet> getTweets() {
