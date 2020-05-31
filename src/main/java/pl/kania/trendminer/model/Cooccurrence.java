@@ -47,4 +47,9 @@ public class Cooccurrence {
         this.timeID = timeID;
         this.support = support;
     }
+
+    @Override
+    public String toString() {
+        return "[" + word1 + ", " + word2 + "]";
+    }
 }

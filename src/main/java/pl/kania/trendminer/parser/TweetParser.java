@@ -18,7 +18,7 @@ import java.util.Set;
 @Component
 public class TweetParser {
 
-    private static final double SUPPORT_MIN_THRESHOLD = 0.5; // TODO
+    private static final double SUPPORT_MIN_THRESHOLD = 0.2; // TODO
     private OpenNlpProvider openNlpProvider;
     private Dao dao;
 
@@ -48,19 +48,24 @@ public class TweetParser {
                 addWordsToCooccurrenceMap(stemmedWords, cooccurrenceCount, cooccurrenceCountPerDocument);
             }
         }
+        log.info("Done filling cooccurrence tables. Found word cooccurrences: " + cooccurrenceCountPerDocument.size());
     }
 
     private void setSupportValuesAndDropUncommonCooccurrences(List<Tweet> tweetsInEnglish, Map<WordCooccurrence, Long> cooccurrenceCountPerDocument) {
         Iterator<Map.Entry<WordCooccurrence, Long>> iterator = cooccurrenceCountPerDocument.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<WordCooccurrence, Long> entry = iterator.next();
+            WordCooccurrence wordCooccurrence = entry.getKey();
             double support = (double)entry.getValue() / tweetsInEnglish.size();
             if (support < SUPPORT_MIN_THRESHOLD) {
                 iterator.remove();
+                log.debug("Dropped word cooccurrence: " + wordCooccurrence.toString() + " with support = " + support);
             } else {
-                entry.getKey().setSupport(support);
+                wordCooccurrence.setSupport(support);
+                log.debug("Preserved word cooccurrence " + wordCooccurrence.toString() + " with support = " + support);
             }
         }
+        log.info("Done setting support values. Preserved word cooccurrences: " + cooccurrenceCountPerDocument.size());
     }
 
     private void addWordsToCooccurrenceMap(List<String> stemmedWords, Map<WordCooccurrence, Long> cooccurrenceCount, Map<WordCooccurrence, Long> cooccurrenceCountPerDocument) {

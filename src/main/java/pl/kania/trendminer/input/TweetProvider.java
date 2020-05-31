@@ -15,7 +15,8 @@ public class TweetProvider {
             "Hurley and Behnken launched from Florida on Saturday.",
             "Hurley's and Behnken's job on the mission is to test all onboard systems and to give their feedback to engineers.",
             "Unbelievable!",
-            "I'm shocked!"
+            "I'm shocked!",
+            "Hurley has done great job!"
     );
 
     public List<Tweet> getTweets() {

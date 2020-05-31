@@ -19,6 +19,8 @@ public class TrendMinerApplication {
 
 		List<Tweet> tweetsInEnglish = receiver.getTweetsInEnglish();
 		applicationContext.getBean(TweetParser.class).parseWordsFromTweetsAndFillCooccurrenceTable(tweetsInEnglish);
+
+		log.info("App finished.");
 	}
 
 }

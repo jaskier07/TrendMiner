@@ -23,6 +23,7 @@ public class Receiver {
 
     public List<Tweet> getTweetsInEnglish() {
         List<Tweet> tweets = new TweetProvider().getTweets();
+        log.info("Tweets found: " + tweets.size());
         filterOutNonEnglishTweets(tweets);
         return tweets;
     }
@@ -34,7 +35,9 @@ public class Receiver {
             int percentageOfEnglishWords = validEnglishWordsCounter.getPercentageOfEnglishWords(tweet);
             if (percentageOfEnglishWords < validEnglishWordThresholdProvider.getThresholdInPercentage(tweet)) {
                 iterator.remove();
+                log.info("Removed non-English tweet: " + tweet.getContent());
             }
         }
+        log.info("Done filtering non-English tweets.");
     }
 }

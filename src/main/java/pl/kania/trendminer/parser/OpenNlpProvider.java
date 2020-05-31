@@ -43,6 +43,8 @@ public class OpenNlpProvider {
         for (int i = 0; i < tokens.length; i++) {
             if (isNounOrVerb(tags[i])) {
                 preservedWords.add(tokens[i]);
+            } else {
+                log.debug("Dropped non-noun and non-verb word: " + tokens[i]);
             }
         }
 

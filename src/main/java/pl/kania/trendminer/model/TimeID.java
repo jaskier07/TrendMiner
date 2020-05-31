@@ -2,6 +2,7 @@ package pl.kania.trendminer.model;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.logging.log4j.util.Strings;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -29,4 +30,9 @@ public class TimeID {
      */
     @Column(name = "DOC_FREQ")
     private Long docFreq;
+
+    @Override
+    public String toString() {
+        return "[" + (startTime == null ? "?" : startTime.toString()) + ", " + (endTime == null ? "?" : endTime.toString()) + "]";
+    }
 }

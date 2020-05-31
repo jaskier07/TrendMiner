@@ -2,27 +2,31 @@ package pl.kania.trendminer.preproc;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
+@Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class TweetContentTokenizer {
 
-    private static final String DELIMETERS = " ,.;:/\\[]()!\'\"|?<>+=";
+    private static final String DELIMITERS = "!\"#$%&\\'()*+,./:;<=>?@[]^_`{|}~ ";
 
     public static List<String> tokenize(String content) {
         content = replaceShortcuts(content);
 
-        StringTokenizer tokenizer = new StringTokenizer(content, DELIMETERS);
+        StringTokenizer tokenizer = new StringTokenizer(content, DELIMITERS);
         List<String> tokens = new ArrayList<>();
 
         while (tokenizer.hasMoreElements()) {
             String token = tokenizer.nextToken();
             if (Strings.isNotBlank(token) && !isDelimiter(token.trim())) {
                 tokens.add(token);
+            } else {
+                log.debug("Dropped token: " + token);
             }
         }
 
@@ -30,7 +34,8 @@ public class TweetContentTokenizer {
     }
 
     private static String replaceShortcuts(String content) {
-        content = content.toLowerCase();;
+        content = content.toLowerCase();
+        ;
         content = content.replaceAll("what's", "what is ");
         content = content.replaceAll("'s", " ");
         content = content.replaceAll("'ve", " have ");
@@ -49,6 +54,6 @@ public class TweetContentTokenizer {
     }
 
     private static boolean isDelimiter(String s) {
-        return DELIMETERS.contains(s);
+        return DELIMITERS.contains(s);
     }
 }
