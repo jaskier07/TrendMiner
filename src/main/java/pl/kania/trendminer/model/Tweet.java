@@ -4,6 +4,7 @@ import lombok.Data;
 import pl.kania.trendminer.preproc.TweetContentTokenizer;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -15,6 +16,7 @@ public class Tweet {
     private String content;
     private LocalDateTime createdAt;
     private List<String> words;
+    private List<String> preprocessedWords = new ArrayList<>();
 
     public Tweet(String id, String lang, String author, String location, String content, LocalDateTime createdAt) {
         this.id = id;

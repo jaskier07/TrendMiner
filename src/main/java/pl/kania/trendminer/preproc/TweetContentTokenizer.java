@@ -27,6 +27,10 @@ public class TweetContentTokenizer {
         return tokens;
     }
 
+    public static String[] tokenizeAndReturnArray(String content) {
+        return tokenize(content).toArray(new String[0]);
+    }
+
     private static boolean isDelimeter(String s) {
         return DELIMETERS.contains(s);
     }

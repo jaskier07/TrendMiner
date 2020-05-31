@@ -1,6 +1,7 @@
 package pl.kania.trendminer.input;
 
 import pl.kania.trendminer.model.Tweet;
+import pl.kania.trendminer.parser.OpenNlpProvider;
 import pl.kania.trendminer.preproc.TweetContentTokenizer;
 
 import java.time.LocalDateTime;
@@ -19,13 +20,15 @@ public class TweetProvider {
     }
 
     public List<Tweet> getTweets() {
-        return Stream.generate(this::getExampleTweet).limit(30).collect(Collectors.toList());
+//        return Stream.generate(this::getExampleTweet).limit(30).collect(Collectors.toList());
+        return List.of(getExampleTweet2());
     }
 
     private Tweet getExampleTweet() {
         StringBuilder content = new StringBuilder("Tweet # ");
         content.append(counter);
         content.append(' ');
+        new OpenNlpProvider().divideIntoSentences("ELO. Siema! Co?");
 
         Random random = new Random();
         for (int i = 0; i < random.nextInt(exampleWords.size()); i++) {
@@ -36,5 +39,9 @@ public class TweetProvider {
         Tweet tweet = new Tweet(String.valueOf(counter), "en", "Author" + counter, "Poland", content.toString(), LocalDateTime.now());
         counter++;
         return tweet;
+    }
+
+    private Tweet getExampleTweet2() {
+        return new Tweet(String.valueOf(counter), "en", "Author" + counter, "Poland", "Rupert Murdoch attacked in Parliament during testimony.", LocalDateTime.now());
     }
 }
