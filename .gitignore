@@ -30,7 +30,11 @@ target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**
 !**/src/test/**
-/src/main/resources/words_alpha.txt
+/src/main/resources/*.txt
+/src/main/resources/*.bin
+/src/main/resources/*.properties
+/src/main/resources/*.zip
+
 
 ### STS ###
 .apt_generated
