@@ -2,7 +2,6 @@ package pl.kania.trendminer.model;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.logging.log4j.util.Strings;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

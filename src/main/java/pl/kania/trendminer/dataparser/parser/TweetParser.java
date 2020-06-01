@@ -1,10 +1,10 @@
-package pl.kania.trendminer.parser;
+package pl.kania.trendminer.dataparser.parser;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import pl.kania.trendminer.dao.Dao;
-import pl.kania.trendminer.Tweet;
+import pl.kania.trendminer.dataparser.Tweet;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -89,9 +89,14 @@ public class TweetParser {
         for (String sentence : sentences) {
             List<String> words = openNlpProvider.filterOutNonWordsAndNouns(sentence);
             for (String word : words) {
+                if (notOmittedWord(word))
                 stemmedWords.add(openNlpProvider.stemWord(word).toLowerCase());
             }
         }
         return stemmedWords;
+    }
+
+    private boolean notOmittedWord(String word) {
+        return !word.equals("is");
     }
 }

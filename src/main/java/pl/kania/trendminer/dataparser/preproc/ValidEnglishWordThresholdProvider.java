@@ -1,7 +1,7 @@
-package pl.kania.trendminer.preproc;
+package pl.kania.trendminer.dataparser.preproc;
 
 import org.springframework.stereotype.Service;
-import pl.kania.trendminer.Tweet;
+import pl.kania.trendminer.dataparser.Tweet;
 
 @Service
 public class ValidEnglishWordThresholdProvider {

@@ -1,4 +1,4 @@
-package pl.kania.trendminer.preproc;
+package pl.kania.trendminer.dataparser.preproc;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

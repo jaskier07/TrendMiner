@@ -1,13 +1,11 @@
-package pl.kania.trendminer.input;
+package pl.kania.trendminer.dataparser.input;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.LineIterator;
 import org.apache.logging.log4j.util.Strings;
-import pl.kania.trendminer.Tweet;
+import pl.kania.trendminer.dataparser.Tweet;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -29,15 +27,19 @@ public class CsvReader {
     public List<Tweet> readFile() {
         List<Tweet> tweets = new ArrayList<>();
 
-        File file = new File(Paths.get(System.getProperty("user.dir") + "/src/main/resources/corona-top-5000.csv").toString());
+        File file = new File(Paths.get(System.getProperty("user.dir") + "/src/main/resources/corona-0-15000.csv").toString());
 
         try (InputStream is = new FileInputStream(file);
              InputStreamReader input = new InputStreamReader(is)) {
 
             CSVParser csvParser = CSVFormat.EXCEL.withFirstRecordAsHeader().parse(input);
             for (CSVRecord record : csvParser) {
-                Tweet tweet = getTweetFromRecord(record);
-                tweets.add(tweet);
+                try {
+                    Tweet tweet = getTweetFromRecord(record);
+                    tweets.add(tweet);
+                } catch (IllegalArgumentException e) {
+                    log.warn("Problem with reading record. Record number: " + record.getRecordNumber(), e);
+                }
             }
         } catch (IOException e) {
             log.error("Cannot find csv containing tweets", e);

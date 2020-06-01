@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import pl.kania.trendminer.model.Cooccurrence;
 import pl.kania.trendminer.model.TimeID;
 import pl.kania.trendminer.model.Word;
-import pl.kania.trendminer.parser.WordCooccurrence;
+import pl.kania.trendminer.dataparser.parser.WordCooccurrence;
 
 import java.util.Map;
 

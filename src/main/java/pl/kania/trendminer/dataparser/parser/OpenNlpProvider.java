@@ -1,6 +1,5 @@
-package pl.kania.trendminer.parser;
+package pl.kania.trendminer.dataparser.parser;
 
-import antlr.Token;
 import lombok.extern.slf4j.Slf4j;
 import opennlp.tools.postag.POSModel;
 import opennlp.tools.postag.POSTagger;
@@ -9,15 +8,11 @@ import opennlp.tools.sentdetect.SentenceDetectorME;
 import opennlp.tools.sentdetect.SentenceModel;
 import opennlp.tools.stemmer.PorterStemmer;
 import opennlp.tools.stemmer.Stemmer;
-import opennlp.tools.tokenize.Tokenizer;
-import opennlp.tools.tokenize.TokenizerME;
-import opennlp.tools.tokenize.TokenizerModel;
-import pl.kania.trendminer.preproc.TweetContentTokenizer;
+import pl.kania.trendminer.dataparser.preproc.TweetContentTokenizer;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Slf4j

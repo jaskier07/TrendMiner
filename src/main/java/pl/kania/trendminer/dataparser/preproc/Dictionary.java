@@ -1,4 +1,4 @@
-package pl.kania.trendminer.preproc;
+package pl.kania.trendminer.dataparser.preproc;
 
 public interface Dictionary {
 

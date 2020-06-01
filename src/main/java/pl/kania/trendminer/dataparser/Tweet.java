@@ -1,13 +1,10 @@
-package pl.kania.trendminer;
+package pl.kania.trendminer.dataparser;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import pl.kania.trendminer.preproc.TweetContentTokenizer;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Data

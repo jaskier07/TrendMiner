@@ -1,4 +1,4 @@
-package pl.kania.trendminer.parser;
+package pl.kania.trendminer.dataparser.parser;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

@@ -1,9 +1,9 @@
-package pl.kania.trendminer.preproc;
+package pl.kania.trendminer.dataparser.preproc;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import pl.kania.trendminer.Tweet;
-import pl.kania.trendminer.parser.OpenNlpProvider;
+import pl.kania.trendminer.dataparser.Tweet;
+import pl.kania.trendminer.dataparser.parser.OpenNlpProvider;
 
 import java.util.List;
 

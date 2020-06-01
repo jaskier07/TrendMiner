@@ -1,6 +1,6 @@
-package pl.kania.trendminer.input;
+package pl.kania.trendminer.dataparser.input;
 
-import pl.kania.trendminer.Tweet;
+import pl.kania.trendminer.dataparser.Tweet;
 
 import java.time.LocalDateTime;
 import java.util.List;
