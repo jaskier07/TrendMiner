@@ -28,12 +28,8 @@ hs_err_pid*
 HELP.md
 target/
 !.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**
-!**/src/test/**
-/src/main/resources/*.txt
-/src/main/resources/*.bin
-/src/main/resources/*.properties
-/src/main/resources/*.zip
+!**/src/main/java/**
+!**/src/test/java/**
 
 
 ### STS ###
@@ -61,7 +57,5 @@ build/
 
 ### VS Code ###
 .vscode/
-/src/main/resources/langdetect-183.bin
-/src/main/resources/en-sent.bin
-/src/main/resources/en-pos-maxent.bin
-/src/main/resources/langdetect-183.bin
+
+/src/main/resources/
