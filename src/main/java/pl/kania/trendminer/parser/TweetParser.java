@@ -18,7 +18,7 @@ import java.util.Set;
 @Component
 public class TweetParser {
 
-    private static final double SUPPORT_MIN_THRESHOLD = 0.2; // TODO
+    private static final double SUPPORT_MIN_THRESHOLD = 0.05; // TODO
     private OpenNlpProvider openNlpProvider;
     private Dao dao;
 
@@ -84,7 +84,7 @@ public class TweetParser {
     }
 
     private List<String> getStemmedWords(String[] sentences) {
-        // TODO!! not stem words that are own names
+        // FIXME - not stem words that are own names if poor results
         List<String> stemmedWords = new ArrayList<>();
         for (String sentence : sentences) {
             List<String> words = openNlpProvider.filterOutNonWordsAndNouns(sentence);

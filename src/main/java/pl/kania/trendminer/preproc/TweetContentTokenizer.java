@@ -13,7 +13,7 @@ import java.util.StringTokenizer;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class TweetContentTokenizer {
 
-    private static final String DELIMITERS = "!\"#$%&\\'()*+,./:;<=>?@[]^_`{|}~ ";
+    private static final String DELIMITERS = "!\"#$%&\\'()*+,./:;<=>?@[]^_`{|}~ …”‘’“";
 
     public static List<String> tokenize(String content) {
         content = replaceShortcuts(content);
@@ -35,7 +35,8 @@ public class TweetContentTokenizer {
 
     private static String replaceShortcuts(String content) {
         content = content.toLowerCase();
-        ;
+
+        content = content.replaceAll("’", "'");
         content = content.replaceAll("what's", "what is ");
         content = content.replaceAll("'s", " ");
         content = content.replaceAll("'ve", " have ");
@@ -46,6 +47,7 @@ public class TweetContentTokenizer {
         content = content.replaceAll("'d", " would ");
         content = content.replaceAll("'ll", " will ");
         content = content.replaceAll("'scuse", " excuse ");
+
         return content;
     }
 

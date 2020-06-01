@@ -20,6 +20,10 @@ public class ValidEnglishWordsCounter {
 
     public int getPercentageOfEnglishWords(Tweet tweet) {
         List<String> words = TweetContentTokenizer.tokenize(tweet.getContent());
+        if (words.isEmpty()) {
+            return 0;
+        }
+
         int englishWordsCount = words.stream()
                 .map(String::toLowerCase)
                 .map(dictionary::isEnglishWord)

@@ -20,7 +20,7 @@ public class TweetProvider {
     );
 
     public List<Tweet> getTweets() {
-        return getExampleTweets();
+        return new CsvReader().readFile();
     }
 
     private List<Tweet> getExampleTweets() {
