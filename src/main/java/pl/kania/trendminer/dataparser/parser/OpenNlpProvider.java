@@ -8,6 +8,10 @@ import opennlp.tools.sentdetect.SentenceDetectorME;
 import opennlp.tools.sentdetect.SentenceModel;
 import opennlp.tools.stemmer.PorterStemmer;
 import opennlp.tools.stemmer.Stemmer;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import pl.kania.trendminer.dataparser.preproc.TweetContentTokenizer;
 
 import java.io.IOException;
@@ -16,13 +20,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
+@Service
 public class OpenNlpProvider {
 
     private SentenceDetectorME sentenceDetector;
     private POSTagger posTagger;
     private Stemmer stemmer;
+    private Environment environment;
 
-    public OpenNlpProvider() {
+    public OpenNlpProvider(@Autowired Environment environment) {
+        this.environment = environment;
         initModel();
     }
 
@@ -63,14 +70,14 @@ public class OpenNlpProvider {
     }
 
     private void initModel() {
-        try (InputStream is = getClass().getResourceAsStream("/en-sent.bin")) {
+        try (InputStream is = getClass().getResourceAsStream(environment.getProperty("pl.kania.path.model.english-sentences"))) {
             SentenceModel sentenceModel = new SentenceModel(is);
             sentenceDetector = new SentenceDetectorME(sentenceModel);
         } catch (IOException e) {
             log.error("Cannot load file containing English sentences", e);
         }
 
-        try (InputStream is = getClass().getResourceAsStream("/en-pos-maxent.bin")) {
+        try (InputStream is = getClass().getResourceAsStream(environment.getProperty("pl.kania.path.model.parts-of-speech"))) {
             POSModel posModel = new POSModel(is);
             posTagger = new POSTaggerME(posModel);
         } catch (IOException e) {

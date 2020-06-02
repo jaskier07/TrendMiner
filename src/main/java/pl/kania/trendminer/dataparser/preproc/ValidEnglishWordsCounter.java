@@ -11,11 +11,9 @@ import java.util.List;
 public class ValidEnglishWordsCounter {
 
     private Dictionary dictionary;
-    private OpenNlpProvider openNlpProvider;
 
     public ValidEnglishWordsCounter(@Autowired Dictionary dictionary) {
         this.dictionary = dictionary;
-        this.openNlpProvider = new OpenNlpProvider();
     }
 
     public int getPercentageOfEnglishWords(Tweet tweet) {

@@ -3,10 +3,11 @@ package pl.kania.trendminer.dao;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import pl.kania.trendminer.dataparser.parser.AnalysedPeriod;
+import pl.kania.trendminer.dataparser.parser.WordCooccurrence;
 import pl.kania.trendminer.model.Cooccurrence;
 import pl.kania.trendminer.model.TimeID;
 import pl.kania.trendminer.model.Word;
-import pl.kania.trendminer.dataparser.parser.WordCooccurrence;
 
 import java.util.Map;
 
@@ -24,10 +25,13 @@ public class Dao {
         this.wordDao = wordDao;
     }
 
-    public void saveTimePeriod(Map<WordCooccurrence, Long> cooccurrenceCountPerDocument, long allDocumentsCount) {
+    public void saveTimePeriod(AnalysedPeriod period) {
+        Map<WordCooccurrence, Long> cooccurrenceCountPerDocument = period.getCooccurrenceCountPerDocument();
+
         TimeID timeID = new TimeID();
-        timeID.setDocFreq(allDocumentsCount);
-        // TODO set periods
+        timeID.setDocFreq(period.getAllDocumentsCount());
+        timeID.setStartTime(period.getStart());
+        timeID.setEndTime(period.getEnd());
 
         timeID = timeIDDao.save(timeID);
         log.info("Saved time period: " + timeID);

@@ -2,62 +2,83 @@ package pl.kania.trendminer.dataparser.parser;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import pl.kania.trendminer.dao.Dao;
 import pl.kania.trendminer.dataparser.Tweet;
+import pl.kania.trendminer.dataparser.input.TweetAnalysisData;
 
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 @Slf4j
 @Component
 public class TweetParser {
 
-    private static final double SUPPORT_MIN_THRESHOLD = 0.05; // TODO
     private OpenNlpProvider openNlpProvider;
     private Dao dao;
+    private Environment environment;
 
-    public TweetParser(@Autowired Dao dao) {
-        this.openNlpProvider = new OpenNlpProvider();
+    public TweetParser(@Autowired Dao dao, @Autowired Environment environment, @Autowired OpenNlpProvider openNlpProvider) {
+        this.openNlpProvider = openNlpProvider;
         this.dao = dao;
+        this.environment = environment;
     }
 
-    public void parseWordsFromTweetsAndFillCooccurrenceTable(List<Tweet> tweetsInEnglish) {
-        Map<WordCooccurrence, Long> cooccurrenceCount = new HashMap<>();
-        Map<WordCooccurrence, Long> cooccurrenceCountPerDocument = new HashMap<>();
+    public void parseWordsFromTweetsAndFillCooccurrenceTable(TweetAnalysisData tweetAnalysisData) {
+        List<Tweet> tweetsInEnglish = tweetAnalysisData.getTweets();
 
-        fillCooccurrenceTables(tweetsInEnglish, cooccurrenceCount, cooccurrenceCountPerDocument);
-        setSupportValuesAndDropUncommonCooccurrences(tweetsInEnglish, cooccurrenceCountPerDocument);
+        Duration periodDuration = Duration.of(Long.parseLong(environment.getProperty("pl.kania.period-duration")), ChronoUnit.MINUTES);
+        List<AnalysedPeriod> periods = PeriodGenerator.generate(tweetAnalysisData.getStart(), tweetAnalysisData.getEnd(), periodDuration);
 
-        dao.saveTimePeriod(cooccurrenceCountPerDocument, tweetsInEnglish.size());
+        fillCooccurrenceTables(tweetsInEnglish, periods);
+        periods.forEach(p -> setSupportValuesAndDropUncommonCooccurrences(tweetsInEnglish, p));
+
+        periods.forEach(p -> dao.saveTimePeriod(p));
     }
 
-    private void fillCooccurrenceTables(List<Tweet> tweetsInEnglish, Map<WordCooccurrence, Long> cooccurrenceCount, Map<WordCooccurrence, Long> cooccurrenceCountPerDocument) {
+    private void fillCooccurrenceTables(List<Tweet> tweetsInEnglish, List<AnalysedPeriod> periods) {
+        log.info("Filling cooccurrence tables...");
         for (Tweet tweet : tweetsInEnglish) {
             String[] sentences = openNlpProvider.divideIntoSentences(tweet.getContent());
             List<String> stemmedWords = getStemmedWords(sentences);
 
             if (stemmedWords.size() > 1) {
-                tweet.setStemmedWords(Set.copyOf(stemmedWords));
-                // FIXME shouldn't it be per sentence, not whole tweet content?
-                addWordsToCooccurrenceMap(stemmedWords, cooccurrenceCount, cooccurrenceCountPerDocument);
+                try {
+                    tweet.setStemmedWords(Set.copyOf(stemmedWords));
+                    AnalysedPeriod currentPeriod = AnalysedPeriod.findPeriodForDate(periods, tweet.getCreatedAt());
+                    currentPeriod.incrementDocumentCount();
+                    // FIXME shouldn't it be per sentence, not whole tweet content?
+                    addWordsToCooccurrenceMap(stemmedWords, currentPeriod);
+                } catch (NoSuchElementException e){
+                    log.error("Cannot find period", e);
+                }
             }
         }
-        log.info("Done filling cooccurrence tables. Found word cooccurrences: " + cooccurrenceCountPerDocument.size());
+
+        Integer allCooccurrences = periods.stream()
+                .map(p -> p.getCooccurrenceCountPerDocument().size())
+                .reduce(Integer::sum)
+                .orElseThrow();
+
+        log.info("Done filling cooccurrence tables. Found word cooccurrences: " + allCooccurrences);
     }
 
-    private void setSupportValuesAndDropUncommonCooccurrences(List<Tweet> tweetsInEnglish, Map<WordCooccurrence, Long> cooccurrenceCountPerDocument) {
-        Iterator<Map.Entry<WordCooccurrence, Long>> iterator = cooccurrenceCountPerDocument.entrySet().iterator();
+    private void setSupportValuesAndDropUncommonCooccurrences(List<Tweet> tweetsInEnglish, AnalysedPeriod period) {
+        log.info("Setting support values...");
+        Iterator<Map.Entry<WordCooccurrence, Long>> iterator = period.getCooccurrenceCountPerDocument().entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<WordCooccurrence, Long> entry = iterator.next();
             WordCooccurrence wordCooccurrence = entry.getKey();
             double support = (double)entry.getValue() / tweetsInEnglish.size();
-            if (support < SUPPORT_MIN_THRESHOLD) {
+            if (support < Double.parseDouble(environment.getProperty("pl.kania.support.min-threshold"))) {
                 iterator.remove();
                 log.debug("Dropped word cooccurrence: " + wordCooccurrence.toString() + " with support = " + support);
             } else {
@@ -65,18 +86,18 @@ public class TweetParser {
                 log.debug("Preserved word cooccurrence " + wordCooccurrence.toString() + " with support = " + support);
             }
         }
-        log.info("Done setting support values. Preserved word cooccurrences: " + cooccurrenceCountPerDocument.size());
+        log.info("Done setting support values. Preserved word cooccurrences: " + period.getCooccurrenceCountPerDocument().size());
     }
 
-    private void addWordsToCooccurrenceMap(List<String> stemmedWords, Map<WordCooccurrence, Long> cooccurrenceCount, Map<WordCooccurrence, Long> cooccurrenceCountPerDocument) {
+    private void addWordsToCooccurrenceMap(List<String> stemmedWords, AnalysedPeriod period) {
         Set<WordCooccurrence> updatedWordCooccurrences = new HashSet<>();
 
         for (int i = 0; i < stemmedWords.size(); i++) {
             for (int j = i + 1; j < stemmedWords.size(); j++) {
                 WordCooccurrence wordCooccurrence = new WordCooccurrence(stemmedWords.get(i), stemmedWords.get(j));
-                cooccurrenceCount.merge(wordCooccurrence, 1L, Long::sum);
+                period.getCooccurrenceCount().merge(wordCooccurrence, 1L, Long::sum);
                 if (!updatedWordCooccurrences.contains(wordCooccurrence)) {
-                    cooccurrenceCountPerDocument.merge(wordCooccurrence, 1L, Long::sum);
+                    period.getCooccurrenceCountPerDocument().merge(wordCooccurrence, 1L, Long::sum);
                     updatedWordCooccurrences.add(wordCooccurrence);
                 }
             }

@@ -1,8 +1,11 @@
 package pl.kania.trendminer.dataparser.preproc;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -14,11 +17,12 @@ import java.util.Set;
 @Service
 public class EnglishDictionary implements Dictionary {
 
-    public static final String PATH_TO_DICT = "/src/main/resources/words_alpha.txt";
     private final Set<String> dictionary;
+    private Environment environment;
 
-    public EnglishDictionary() {
+    public EnglishDictionary(@Autowired Environment environment) {
         dictionary = new HashSet<>();
+        this.environment = environment;
         initDictionary();
     }
 
@@ -40,6 +44,6 @@ public class EnglishDictionary implements Dictionary {
     }
 
     private Path getPathToDict() {
-        return Paths.get(System.getProperty("user.dir") + PATH_TO_DICT);
+        return new File(environment.getProperty("pl.kania.path.english-dictionary")).toPath();
     }
 }

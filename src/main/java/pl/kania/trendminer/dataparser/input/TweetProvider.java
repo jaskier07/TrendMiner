@@ -19,8 +19,8 @@ public class TweetProvider {
             "Hurley has done great job!"
     );
 
-    public List<Tweet> getTweets() {
-        return new CsvReader().readFile();
+    public TweetAnalysisData getTweetsAndTweetAnalysisPeriod(String path) {
+        return new CsvReader().readFile(path);
     }
 
     private List<Tweet> getExampleTweets() {

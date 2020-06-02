@@ -5,6 +5,9 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.logging.log4j.util.Strings;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
 import pl.kania.trendminer.dataparser.Tweet;
 
 import java.io.File;
@@ -13,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -24,27 +28,34 @@ public class CsvReader {
 
     private static final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("EEE LLL dd HH:mm:ss xxxx yyyy");
 
-    public List<Tweet> readFile() {
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
+
+    public TweetAnalysisData readFile(String path) {
+        startTime = LocalDateTime.MAX;
+        endTime = LocalDateTime.MIN;
         List<Tweet> tweets = new ArrayList<>();
 
-        File file = new File(Paths.get(System.getProperty("user.dir") + "/src/main/resources/corona-0-15000.csv").toString());
-
-        try (InputStream is = new FileInputStream(file);
-             InputStreamReader input = new InputStreamReader(is)) {
-
+        try (InputStream is = getClass().getResourceAsStream(path);
+             InputStreamReader input = new InputStreamReader(is)
+        ) {
+            log.info("File is being read...");
             CSVParser csvParser = CSVFormat.EXCEL.withFirstRecordAsHeader().parse(input);
             for (CSVRecord record : csvParser) {
                 try {
                     Tweet tweet = getTweetFromRecord(record);
                     tweets.add(tweet);
-                } catch (IllegalArgumentException e) {
+                } catch (Exception e) {
                     log.warn("Problem with reading record. Record number: " + record.getRecordNumber(), e);
                 }
             }
+
+            log.info("Finished reading file.");
         } catch (IOException e) {
             log.error("Cannot find csv containing tweets", e);
         }
-        return tweets;
+
+        return new TweetAnalysisData(tweets, startTime, endTime);
     }
 
     private Tweet getTweetFromRecord(CSVRecord record) {
@@ -69,7 +80,14 @@ public class CsvReader {
             return null;
         }
         try {
-            return LocalDateTime.from(dtf.parse(value));
+            LocalDateTime date = LocalDateTime.from(dtf.parse(value));
+            if (date.isBefore(startTime)) {
+                startTime = date;
+            }
+            if (date.isAfter(endTime)) {
+                endTime = date;
+            }
+            return date;
         } catch (DateTimeParseException e) {
             log.error("Cannot parse date: " + value, e);
             return null;

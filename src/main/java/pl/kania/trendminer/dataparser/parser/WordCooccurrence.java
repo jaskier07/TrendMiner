@@ -1,10 +1,6 @@
 package pl.kania.trendminer.dataparser.parser;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.Value;
 
 @Data
 public class WordCooccurrence {
