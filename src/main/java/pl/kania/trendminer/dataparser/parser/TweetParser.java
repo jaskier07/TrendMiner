@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
+import pl.kania.trendminer.util.ProgressLogger;
 import pl.kania.trendminer.dao.Dao;
 import pl.kania.trendminer.dataparser.Tweet;
 import pl.kania.trendminer.dataparser.input.TweetAnalysisData;
@@ -22,6 +23,8 @@ import java.util.Set;
 @Component
 public class TweetParser {
 
+    private static final String[] WORDS_TO_OMIT = { "is", "a", "an", "the", "i", "we", "you", "rt"};
+
     private OpenNlpProvider openNlpProvider;
     private Dao dao;
     private Environment environment;
@@ -39,13 +42,14 @@ public class TweetParser {
         List<AnalysedPeriod> periods = PeriodGenerator.generate(tweetAnalysisData.getStart(), tweetAnalysisData.getEnd(), periodDuration);
 
         fillCooccurrenceTables(tweetsInEnglish, periods);
-        periods.forEach(p -> setSupportValuesAndDropUncommonCooccurrences(tweetsInEnglish, p));
+        periods.forEach(p -> setSupportValuesAndDropUncommonCooccurrences(p));
 
         periods.forEach(p -> dao.saveTimePeriod(p));
     }
 
     private void fillCooccurrenceTables(List<Tweet> tweetsInEnglish, List<AnalysedPeriod> periods) {
         log.info("Filling cooccurrence tables...");
+        long counter = 0;
         for (Tweet tweet : tweetsInEnglish) {
             String[] sentences = openNlpProvider.divideIntoSentences(tweet.getContent());
             List<String> stemmedWords = getStemmedWords(sentences);
@@ -55,13 +59,14 @@ public class TweetParser {
                     tweet.setStemmedWords(Set.copyOf(stemmedWords));
                     AnalysedPeriod currentPeriod = AnalysedPeriod.findPeriodForDate(periods, tweet.getCreatedAt());
                     currentPeriod.incrementDocumentCount();
-                    // FIXME shouldn't it be per sentence, not whole tweet content?
                     addWordsToCooccurrenceMap(stemmedWords, currentPeriod);
                 } catch (NoSuchElementException e){
                     log.error("Cannot find period", e);
                 }
             }
+            ProgressLogger.log(counter++, 3000);
         }
+        ProgressLogger.done();
 
         Integer allCooccurrences = periods.stream()
                 .map(p -> p.getCooccurrenceCountPerDocument().size())
@@ -71,13 +76,14 @@ public class TweetParser {
         log.info("Done filling cooccurrence tables. Found word cooccurrences: " + allCooccurrences);
     }
 
-    private void setSupportValuesAndDropUncommonCooccurrences(List<Tweet> tweetsInEnglish, AnalysedPeriod period) {
+    private void setSupportValuesAndDropUncommonCooccurrences(AnalysedPeriod period) {
         log.info("Setting support values...");
         Iterator<Map.Entry<WordCooccurrence, Long>> iterator = period.getCooccurrenceCountPerDocument().entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<WordCooccurrence, Long> entry = iterator.next();
             WordCooccurrence wordCooccurrence = entry.getKey();
-            double support = (double)entry.getValue() / tweetsInEnglish.size();
+            double support = (double)entry.getValue() / period.getAllDocumentsCount();
+            // FIXME perform dropping?
             if (support < Double.parseDouble(environment.getProperty("pl.kania.support.min-threshold"))) {
                 iterator.remove();
                 log.debug("Dropped word cooccurrence: " + wordCooccurrence.toString() + " with support = " + support);
@@ -95,7 +101,6 @@ public class TweetParser {
         for (int i = 0; i < stemmedWords.size(); i++) {
             for (int j = i + 1; j < stemmedWords.size(); j++) {
                 WordCooccurrence wordCooccurrence = new WordCooccurrence(stemmedWords.get(i), stemmedWords.get(j));
-                period.getCooccurrenceCount().merge(wordCooccurrence, 1L, Long::sum);
                 if (!updatedWordCooccurrences.contains(wordCooccurrence)) {
                     period.getCooccurrenceCountPerDocument().merge(wordCooccurrence, 1L, Long::sum);
                     updatedWordCooccurrences.add(wordCooccurrence);
@@ -107,17 +112,27 @@ public class TweetParser {
     private List<String> getStemmedWords(String[] sentences) {
         // FIXME - not stem words that are own names if poor results
         List<String> stemmedWords = new ArrayList<>();
+
         for (String sentence : sentences) {
+            if (sentence.startsWith("http")) {
+                continue;
+            }
             List<String> words = openNlpProvider.filterOutNonWordsAndNouns(sentence);
             for (String word : words) {
-                if (notOmittedWord(word))
-                stemmedWords.add(openNlpProvider.stemWord(word).toLowerCase());
+                if (!wordToOmit(word)) {
+                    stemmedWords.add(openNlpProvider.stemWord(word).toLowerCase());
+                }
             }
         }
         return stemmedWords;
     }
 
-    private boolean notOmittedWord(String word) {
-        return !word.equals("is");
+    private boolean wordToOmit(String word) {
+        for (String wordToOmit : WORDS_TO_OMIT) {
+            if (word.equals(wordToOmit)) {
+                return true;
+            }
+        }
+        return word.length() < 2;
     }
 }

@@ -22,7 +22,9 @@ public class AnalysedPeriod {
 
     private final @NonNull LocalDateTime start;
     private final @NonNull LocalDateTime end;
-    private final Map<WordCooccurrence, Long> cooccurrenceCount = new HashMap<>();
+    /**
+     * Number of times word cooccurrence appeared in different documents in this time period.
+     */
     private final Map<WordCooccurrence, Long> cooccurrenceCountPerDocument = new HashMap<>();
     private long allDocumentsCount;
 

@@ -5,18 +5,13 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.logging.log4j.util.Strings;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
-import org.springframework.stereotype.Component;
+import pl.kania.trendminer.ParserExecutionException;
+import pl.kania.trendminer.util.ProgressLogger;
 import pl.kania.trendminer.dataparser.Tweet;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.file.Paths;
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -45,17 +40,20 @@ public class CsvReader {
                 try {
                     Tweet tweet = getTweetFromRecord(record);
                     tweets.add(tweet);
+
+                    ProgressLogger.log(record.getRecordNumber());
                 } catch (Exception e) {
                     log.warn("Problem with reading record. Record number: " + record.getRecordNumber(), e);
                 }
             }
+            ProgressLogger.done();
 
             log.info("Finished reading file.");
+            return new TweetAnalysisData(tweets, startTime, endTime);
         } catch (IOException e) {
             log.error("Cannot find csv containing tweets", e);
+            throw new ParserExecutionException(e.getMessage());
         }
-
-        return new TweetAnalysisData(tweets, startTime, endTime);
     }
 
     private Tweet getTweetFromRecord(CSVRecord record) {
@@ -70,8 +68,8 @@ public class CsvReader {
     }
 
     private String parseContent(String text) {
-        text = text.replaceFirst("^RT @(.*):", "");
-        text = text.replaceFirst("^@[^\\s]*", "");
+        text = text.replaceAll("RT @(.*):", "");
+        text = text.replaceAll("@[^\\s]*", "");
         return text;
     }
 

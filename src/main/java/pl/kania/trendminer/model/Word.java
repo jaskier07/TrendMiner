@@ -11,7 +11,7 @@ import javax.persistence.Id;
 @Getter
 @NoArgsConstructor
 @Entity
-public class Word {
+public class Word implements Comparable<Word> {
 
     @Id
     @GeneratedValue
@@ -27,5 +27,15 @@ public class Word {
     @Override
     public String toString() {
         return word;
+    }
+
+    @Override
+    public int compareTo(Word other) {
+        if (other == null || other.getWord() == null) {
+            return -1;
+        } else if (word == null) {
+            return 1;
+        }
+        return word.compareTo(other.getWord());
     }
 }
