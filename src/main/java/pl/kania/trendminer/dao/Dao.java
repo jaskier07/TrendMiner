@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import pl.kania.trendminer.dataparser.parser.AnalysedPeriod;
 import pl.kania.trendminer.dataparser.parser.WordCooccurrence;
 import pl.kania.trendminer.model.Cooccurrence;
-import pl.kania.trendminer.model.TimeID;
+import pl.kania.trendminer.model.TimeId;
 import pl.kania.trendminer.model.Word;
 
 import java.util.Map;
@@ -28,7 +28,7 @@ public class Dao {
     public void saveTimePeriod(AnalysedPeriod period) {
         Map<WordCooccurrence, Long> cooccurrenceCountPerDocument = period.getCooccurrenceCountPerDocument();
 
-        TimeID timeID = new TimeID();
+        TimeId timeID = new TimeId();
         timeID.setDocFreq(period.getAllDocumentsCount());
         timeID.setStartTime(period.getStart());
         timeID.setEndTime(period.getEnd());
@@ -46,7 +46,7 @@ public class Dao {
         log.info("Done saving word cooccurrences. Saved " + cooccurrenceCountPerDocument.size() + " records.");
     }
 
-    private void saveCooccurrence(TimeID timeID, Word word1, Word word2, Double support) {
+    private void saveCooccurrence(TimeId timeID, Word word1, Word word2, Double support) {
         Cooccurrence cooccurrence = new Cooccurrence(word1, word2, timeID, support);
         cooccurrenceDao.save(cooccurrence);
         log.debug("Saved word cooccurrence: " + cooccurrence);

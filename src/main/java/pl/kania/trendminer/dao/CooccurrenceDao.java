@@ -2,10 +2,14 @@ package pl.kania.trendminer.dao;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import pl.kania.trendminer.model.Cooccurrence;
+import pl.kania.trendminer.model.TimeId;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface CooccurrenceDao extends JpaRepository<Cooccurrence, Long> {
 
-    Optional<Cooccurrence> findFirstByWord1AndWord2AndTimeID(Long word1, Long word2, Long timeId);
+    List<Cooccurrence> findAllByTimeIDId(Long timeId);
+
 }
