@@ -23,26 +23,30 @@ import java.util.Set;
 @Component
 public class TweetParser {
 
-    private static final String[] WORDS_TO_OMIT = { "is", "a", "an", "the", "i", "we", "you", "rt"};
+    private static final String[] WORDS_TO_OMIT = {"is", "a", "an", "the", "i", "we", "you", "rt"}; //, "did", "be", "ha", "co"+
 
     private OpenNlpProvider openNlpProvider;
     private Dao dao;
     private Environment environment;
+    private final int minWordLength;
 
     public TweetParser(@Autowired Dao dao, @Autowired Environment environment, @Autowired OpenNlpProvider openNlpProvider) {
         this.openNlpProvider = openNlpProvider;
         this.dao = dao;
         this.environment = environment;
+        this.minWordLength = Integer.parseInt(environment.getProperty("pl.kania.min-word-length"));
     }
 
     public void parseWordsFromTweetsAndFillCooccurrenceTable(TweetAnalysisData tweetAnalysisData) {
         List<Tweet> tweetsInEnglish = tweetAnalysisData.getTweets();
 
-        Duration periodDuration = Duration.of(Long.parseLong(environment.getProperty("pl.kania.period-duration")), ChronoUnit.MINUTES);
+        long periodStep = Long.parseLong(environment.getProperty("pl.kania.period-duration"));
+        int chronoUnitOrdinal = Integer.parseInt(environment.getProperty("pl.kania.period-duration.chrono-unit-ordinal"));
+        Duration periodDuration = Duration.of(periodStep, ChronoUnit.values()[chronoUnitOrdinal]);
         List<AnalysedPeriod> periods = PeriodGenerator.generate(tweetAnalysisData.getStart(), tweetAnalysisData.getEnd(), periodDuration);
 
         fillCooccurrenceTables(tweetsInEnglish, periods);
-        periods.forEach(p -> setSupportValuesAndDropUncommonCooccurrences(p));
+        periods.forEach(this::setSupportValuesAndDropUncommonCooccurrences);
 
         periods.forEach(p -> dao.saveTimePeriod(p));
     }
@@ -60,11 +64,11 @@ public class TweetParser {
                     AnalysedPeriod currentPeriod = AnalysedPeriod.findPeriodForDate(periods, tweet.getCreatedAt());
                     currentPeriod.incrementDocumentCount();
                     addWordsToCooccurrenceMap(stemmedWords, currentPeriod);
-                } catch (NoSuchElementException e){
+                } catch (NoSuchElementException e) {
                     log.error("Cannot find period", e);
                 }
             }
-            ProgressLogger.log(counter++, 3000);
+            ProgressLogger.log(counter++, 1000);
         }
         ProgressLogger.done();
 
@@ -82,7 +86,7 @@ public class TweetParser {
         while (iterator.hasNext()) {
             Map.Entry<WordCooccurrence, Long> entry = iterator.next();
             WordCooccurrence wordCooccurrence = entry.getKey();
-            double support = (double)entry.getValue() / period.getAllDocumentsCount();
+            double support = (double) entry.getValue() / period.getAllDocumentsCount();
             // FIXME perform dropping?
             if (support < Double.parseDouble(environment.getProperty("pl.kania.support.min-threshold"))) {
                 iterator.remove();
@@ -120,7 +124,8 @@ public class TweetParser {
             List<String> words = openNlpProvider.filterOutNonWordsAndNouns(sentence);
             for (String word : words) {
                 if (!wordToOmit(word)) {
-                    stemmedWords.add(openNlpProvider.stemWord(word).toLowerCase());
+                    String stemmedWord = openNlpProvider.stemWord(word).toLowerCase();
+                    stemmedWords.add(stemmedWord);
                 }
             }
         }
@@ -133,6 +138,6 @@ public class TweetParser {
                 return true;
             }
         }
-        return word.length() < 2;
+        return word.length() < minWordLength;
     }
 }
