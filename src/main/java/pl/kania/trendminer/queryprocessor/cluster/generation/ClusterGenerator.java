@@ -1,16 +1,22 @@
 package pl.kania.trendminer.queryprocessor.cluster.generation;
 
+import lombok.extern.slf4j.Slf4j;
 import pl.kania.trendminer.queryprocessor.cluster.model.CooccurrenceAllPeriods;
 import pl.kania.trendminer.queryprocessor.SupportComputer;
 import pl.kania.trendminer.queryprocessor.cluster.model.Cluster;
 import pl.kania.trendminer.queryprocessor.cluster.model.ClusterSize;
+import pl.kania.trendminer.util.ProgressLogger;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Slf4j
 public class ClusterGenerator {
 
     private final Map<CooccurrenceAllPeriods, CooccurrenceAllPeriods> cooccurrences;
@@ -23,7 +29,38 @@ public class ClusterGenerator {
                 .collect(Collectors.toMap(c -> c, c -> c));
     }
 
-    public Optional<Cluster> generate(Cluster cluster1, Cluster cluster2) {
+    public Map<ClusterSize, List<Cluster>> generateLargerWordClusters(List<Cluster> twoWordClusters) {
+        Map<ClusterSize, List<Cluster>> wordClustersPerSize = new HashMap<>();
+        wordClustersPerSize.put(ClusterSize.TWO, twoWordClusters);
+
+        long counter = 0;
+        log.info("Generating larger world clusters started.");
+        for (ClusterSize clusterSize = ClusterSize.TWO; !wordClustersPerSize.get(clusterSize).isEmpty(); clusterSize = ClusterSize.next(clusterSize)) {
+            Set<Cluster> nextWordClusters = new HashSet<>();
+            ClusterSize nextClusterSize = ClusterSize.next(clusterSize);
+
+            for (int j = 0; j < wordClustersPerSize.get(clusterSize).size(); j++) {
+                // FIXME start from k = j + 1?
+                for (int k = 0; k < wordClustersPerSize.get(clusterSize).size(); k++) {
+                    Cluster cluster1 = wordClustersPerSize.get(clusterSize).get(j);
+                    Cluster cluster2 = wordClustersPerSize.get(clusterSize).get(k);
+                    if (!cluster1.equals(cluster2)) {
+                        generate(cluster1, cluster2).ifPresent(nextWordClusters::add);
+                    }
+                }
+                ProgressLogger.log(counter++, 20000);
+            }
+            ProgressLogger.done();
+            log.info("Generating " + ClusterSize.getSize(nextClusterSize) + "-clusters ended. Generated " + nextWordClusters.size() + " clusters.");
+
+            wordClustersPerSize.put(nextClusterSize, List.of(nextWordClusters.toArray(new Cluster[0])));
+        }
+        log.info("Generating larger world clusters ended.");
+
+        return wordClustersPerSize;
+    }
+
+    private Optional<Cluster> generate(Cluster cluster1, Cluster cluster2) {
         requireSameSize(cluster1, cluster2);
         ClusterSize clusterSize = cluster1.getSize();
 
@@ -43,9 +80,9 @@ public class ClusterGenerator {
     }
 
     private double getSupport(String word1, String word2) {
-        CooccurrenceAllPeriods coocc = cooccurrences.get(new CooccurrenceAllPeriods(word1, word2));
-        if (coocc != null) {
-            return coocc.getSupport();
+        CooccurrenceAllPeriods cooccurrence = cooccurrences.get(new CooccurrenceAllPeriods(word1, word2));
+        if (cooccurrence != null) {
+            return cooccurrence.getSupport();
         }
         return 0;
     }
