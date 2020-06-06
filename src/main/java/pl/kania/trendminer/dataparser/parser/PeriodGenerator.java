@@ -26,7 +26,7 @@ public class PeriodGenerator {
             periods.add(newPeriod);
             periodStart = periodEnd;
 
-            log.info("Period created: " + newPeriod.toString());
+            log.debug("Period created: " + newPeriod.toString());
         }
 
         log.info("Created " + periods.size() + " periods.");

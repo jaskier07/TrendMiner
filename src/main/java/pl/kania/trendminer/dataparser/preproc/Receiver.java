@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import pl.kania.trendminer.dataparser.Tweet;
 import pl.kania.trendminer.dataparser.input.TweetAnalysisData;
 import pl.kania.trendminer.dataparser.input.TweetProvider;
+import pl.kania.trendminer.util.ProgressLogger;
 
 import java.util.Iterator;
 import java.util.List;
@@ -35,6 +36,10 @@ public class Receiver {
     }
 
     private void filterOutNonEnglishTweets(List<Tweet> tweets) {
+        log.info("Filtering non-English tweets started.");
+        int tweetsBeforeFilteringOut = tweets.size();
+
+        int counter = 0;
         Iterator<Tweet> iterator = tweets.iterator();
         while (iterator.hasNext()) {
             Tweet tweet = iterator.next();
@@ -43,7 +48,11 @@ public class Receiver {
                 iterator.remove();
                 log.debug("Removed non-English tweet: " + tweet.getContent());
             }
+            ProgressLogger.log(counter++);
         }
-        log.info("Done filtering non-English tweets.");
+        ProgressLogger.done();
+
+        double percentageOfRemovedTweets = 100 * (1. - ((double) tweets.size() / tweetsBeforeFilteringOut));
+        log.info("Done filtering non-English tweets. % of removed tweets: " + percentageOfRemovedTweets);
     }
 }
