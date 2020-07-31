@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import pl.kania.trendminer.queryprocessor.ResultPrinter;
+import pl.kania.trendminer.queryprocessor.cluster.trending.TrendingClusterDetector;
 import pl.kania.trendminer.util.ProgressLogger;
 import pl.kania.trendminer.dao.CooccurrenceDao;
 import pl.kania.trendminer.model.Cooccurrence;
@@ -30,12 +31,14 @@ public class FrequentlyOccurringClusterIdentifier {
 
     private final CooccurrenceDao cooccurrenceDao;
     private final TwoWordClusterGenerator twoWordClusterGenerator;
+    private TrendingClusterDetector trendingClusterDetector;
     private final double thresholdSupport;
 
     public FrequentlyOccurringClusterIdentifier(@Autowired CooccurrenceDao cooccurrenceDao, @Autowired Environment environment,
-                                                @Autowired TwoWordClusterGenerator twoWordClusterGenerator) {
+                                                @Autowired TwoWordClusterGenerator twoWordClusterGenerator, @Autowired TrendingClusterDetector trendingClusterDetector) {
         this.twoWordClusterGenerator = twoWordClusterGenerator;
         this.cooccurrenceDao = cooccurrenceDao;
+        this.trendingClusterDetector = trendingClusterDetector;
         thresholdSupport = Double.parseDouble(environment.getProperty("pl.kania.time.threshold-support"));
     }
 
@@ -51,6 +54,9 @@ public class FrequentlyOccurringClusterIdentifier {
         Map<ClusterSize, List<Cluster>> wordClusters = new ClusterGenerator(clusterGeneratorResult.getCooccurrences(), thresholdSupport)
                 .generateLargerWordClusters(twoWordClusters);
         ResultPrinter.printResults(wordClusters);
+
+        List<Cluster> trendingClusters = trendingClusterDetector.detect(wordClusters, allCooccurrencesPerId);
+        ResultPrinter.printResults(trendingClusters);
     }
 
     private Long getTotalFrequency(List<TimeId> timeIds) {

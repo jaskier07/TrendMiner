@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import pl.kania.trendminer.queryprocessor.cluster.model.Cluster;
 import pl.kania.trendminer.queryprocessor.cluster.model.ClusterSize;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -24,7 +25,7 @@ public class ResultPrinter {
         } else {
             List<List<Cluster>> clusters = wordClustersPerSize.entrySet()
                     .stream()
-                    .sorted((o1, o2) -> o1.getKey().ordinal() - o2.getKey().ordinal())
+                    .sorted(Comparator.comparingInt(o -> o.getKey().ordinal()))
                     .map(Map.Entry::getValue)
                     .skip(minClusterSize - 2)
                     .collect(Collectors.toList());
@@ -36,5 +37,14 @@ public class ResultPrinter {
                 }
             }
         }
+    }
+
+    public static void printResults(List<Cluster> trendingClusters) {
+        log.info("Trending clusters:");
+        trendingClusters.forEach(t -> {
+            if (t.getSize().ordinal() > 1) {
+                log.info(t.toString() + ", " + t.getBurstiness());
+            }
+        });
     }
 }

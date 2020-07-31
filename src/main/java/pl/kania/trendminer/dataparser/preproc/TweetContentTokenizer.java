@@ -13,7 +13,7 @@ import java.util.StringTokenizer;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class TweetContentTokenizer {
 
-    private static final String DELIMITERS = "!\"#$%&\\'()*+,./:;<=>?@[]^_`{|}~ …”‘’“\r\n#";
+    private static final String DELIMITERS = "!\"#$%&\\'()*+,.:;<=>?@[]^_`{|}~ …”‘’“\r\n#";
 
     public static List<String> tokenize(String content) {
         content = replaceShortcuts(content);

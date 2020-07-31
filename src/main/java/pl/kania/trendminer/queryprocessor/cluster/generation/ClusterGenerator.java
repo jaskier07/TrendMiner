@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -33,7 +34,9 @@ public class ClusterGenerator {
         Map<ClusterSize, List<Cluster>> wordClustersPerSize = new HashMap<>();
         wordClustersPerSize.put(ClusterSize.TWO, twoWordClusters);
 
+        long notPresentCounter = 0;
         long counter = 0;
+        long totalCounter = 0;
         log.info("Generating larger world clusters started.");
         for (ClusterSize clusterSize = ClusterSize.TWO; !wordClustersPerSize.get(clusterSize).isEmpty(); clusterSize = ClusterSize.next(clusterSize)) {
             Set<Cluster> nextWordClusters = new HashSet<>();
@@ -45,13 +48,19 @@ public class ClusterGenerator {
                     Cluster cluster1 = wordClustersPerSize.get(clusterSize).get(j);
                     Cluster cluster2 = wordClustersPerSize.get(clusterSize).get(k);
                     if (!cluster1.equals(cluster2)) {
-                        generate(cluster1, cluster2).ifPresent(nextWordClusters::add);
+                        try {
+                            totalCounter++;
+                            nextWordClusters.add(generate(cluster1, cluster2).orElseThrow());
+                        } catch (NoSuchElementException e) {
+                            notPresentCounter++;
+                        }
                     }
                 }
                 ProgressLogger.log(counter++, 20000);
             }
             ProgressLogger.done();
             log.info("Generating " + ClusterSize.getSize(nextClusterSize) + "-clusters ended. Generated " + nextWordClusters.size() + " clusters.");
+//            log.warn("Percentage of omitted words: " + (100*(double)notPresentCounter / totalCounter));
 
             wordClustersPerSize.put(nextClusterSize, List.of(nextWordClusters.toArray(new Cluster[0])));
         }

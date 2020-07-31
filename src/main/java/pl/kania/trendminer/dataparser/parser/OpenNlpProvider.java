@@ -62,11 +62,13 @@ public class OpenNlpProvider {
     }
 
     private boolean isVerb(String tag) {
-        return tag.equals("VB") || tag.equals("VBD") || tag.equals("VBZ");
+        // verb (base form), verb (past tense), verb (3rd person singular present),
+        return tag.startsWith("VB");//tag.equals("VB") || tag.equals("VBD") || tag.equals("VBZ") || tag.equals();
     }
 
     private boolean isNoun(String tag) {
-        return tag.equals("NN") || tag.equals("NNP");
+        // noun (singular or mass), noun (proper noun, singular), noun (plural), noun (proper noun, plural)
+        return tag.startsWith("NN"); //tag.equals("NN") || tag.equals("NNP") || tag.equals("NNS") || tag.equals("NNPS");
     }
 
     private void initModel() {

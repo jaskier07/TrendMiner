@@ -1,10 +1,14 @@
 package pl.kania.trendminer.dataparser.parser;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class WordCooccurrence {
+    @EqualsAndHashCode.Include
     private final String word1;
+    @EqualsAndHashCode.Include
     private final String word2;
     private Double support;
 
@@ -16,6 +20,11 @@ public class WordCooccurrence {
             this.word1 = word2;
             this.word2 = word1;
         }
+    }
+
+    public WordCooccurrence(String word1, String word2, double support) {
+        this(word1, word2);
+        this.support = support;
     }
 
     @Override

@@ -23,7 +23,7 @@ import java.util.Set;
 @Component
 public class TweetParser {
 
-    private static final String[] WORDS_TO_OMIT = {"is", "a", "an", "the", "i", "we", "you", "rt"}; //, "did", "be", "ha", "co"+
+    private static final String[] WORDS_TO_OMIT = {"is", "a", "an", "the", "i", "we", "you", "rt"};
 
     private OpenNlpProvider openNlpProvider;
     private Dao dao;
@@ -96,7 +96,7 @@ public class TweetParser {
                 log.debug("Preserved word cooccurrence " + wordCooccurrence.toString() + " with support = " + support);
             }
         }
-        log.info("Done setting support values. Preserved word cooccurrences: " + period.getCooccurrenceCountPerDocument().size());
+        log.debug("Done setting support values. Preserved word cooccurrences: " + period.getCooccurrenceCountPerDocument().size());
     }
 
     private void addWordsToCooccurrenceMap(List<String> stemmedWords, AnalysedPeriod period) {
@@ -125,7 +125,9 @@ public class TweetParser {
             for (String word : words) {
                 if (!wordToOmit(word)) {
                     String stemmedWord = openNlpProvider.stemWord(word).toLowerCase();
-                    stemmedWords.add(stemmedWord);
+                    if (stemmedWord.length() >= minWordLength) {
+                        stemmedWords.add(stemmedWord);
+                    }
                 }
             }
         }

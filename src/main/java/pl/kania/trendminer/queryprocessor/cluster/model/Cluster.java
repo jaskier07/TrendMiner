@@ -10,6 +10,7 @@ import java.util.List;
 public class Cluster {
     private final ClusterSize size;
     private final List<String> words;
+    private double burstiness;
 
     public Cluster(ClusterSize size, List<String> words) {
         this.size = size;
@@ -30,5 +31,9 @@ public class Cluster {
         List<String> newWords = new ArrayList<>(words);
         newWords.add(newWord);
         return new Cluster(ClusterSize.next(cluster.getSize()), newWords);
+    }
+
+    public int getIntSize() {
+        return ClusterSize.getSize(size);
     }
 }
