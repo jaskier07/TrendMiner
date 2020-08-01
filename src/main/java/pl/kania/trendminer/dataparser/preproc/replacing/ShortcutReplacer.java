@@ -1,25 +1,12 @@
-package pl.kania.trendminer.dataparser.preproc;
+package pl.kania.trendminer.dataparser.preproc.replacing;
 
-import pl.kania.trendminer.dataparser.Tweet;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
-public class TweetContentPreprocessor {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public class ShortcutReplacer {
 
-    public void performPreprocessing(Tweet tweet) {
-        String content = tweet.getContent();
-        content = removeMentions(content);
-        content = replaceShortcuts(content);
-        content = HashtagReplacer.replaceHashtags(content);
-        tweet.setContent(content);
-    }
-
-    private String removeMentions(String text) {
-        text = text.replaceAll("RT @(.*):", "");
-        text = text.replaceAll("@[^\\s]*", "");
-        return text;
-    }
-
-
-    private static String replaceShortcuts(String content) {
+    public static String replaceShortcuts(String content) {
         content = content.toLowerCase();
 
         content = content.replaceAll("’", "'");

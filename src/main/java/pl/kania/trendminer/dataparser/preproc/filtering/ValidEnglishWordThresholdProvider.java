@@ -1,4 +1,4 @@
-package pl.kania.trendminer.dataparser.preproc;
+package pl.kania.trendminer.dataparser.preproc.filtering;
 
 import org.springframework.stereotype.Service;
 import pl.kania.trendminer.dataparser.Tweet;

@@ -1,4 +1,4 @@
-package pl.kania.trendminer.dataparser.preproc;
+package pl.kania.trendminer.dataparser.preproc.replacing;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

@@ -10,9 +10,8 @@ import opennlp.tools.stemmer.PorterStemmer;
 import opennlp.tools.stemmer.Stemmer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-import pl.kania.trendminer.dataparser.preproc.TweetContentTokenizer;
+import pl.kania.trendminer.dataparser.preproc.filtering.TweetContentTokenizer;
 
 import java.io.IOException;
 import java.io.InputStream;

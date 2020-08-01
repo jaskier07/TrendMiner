@@ -1,4 +1,4 @@
-package pl.kania.trendminer.dataparser.preproc;
+package pl.kania.trendminer.dataparser.preproc.filtering;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +9,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Set;
 

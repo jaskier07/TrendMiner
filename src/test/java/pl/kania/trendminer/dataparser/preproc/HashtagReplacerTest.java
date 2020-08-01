@@ -1,10 +1,9 @@
 package pl.kania.trendminer.dataparser.preproc;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import pl.kania.trendminer.dataparser.preproc.replacing.HashtagReplacer;
 
 import static org.junit.jupiter.api.Assertions.*;
 

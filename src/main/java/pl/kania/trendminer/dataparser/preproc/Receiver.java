@@ -7,6 +7,9 @@ import org.springframework.stereotype.Service;
 import pl.kania.trendminer.dataparser.Tweet;
 import pl.kania.trendminer.dataparser.input.TweetAnalysisData;
 import pl.kania.trendminer.dataparser.input.TweetProvider;
+import pl.kania.trendminer.dataparser.preproc.replacing.TweetContentPreprocessor;
+import pl.kania.trendminer.dataparser.preproc.filtering.ValidEnglishWordThresholdProvider;
+import pl.kania.trendminer.dataparser.preproc.filtering.ValidEnglishWordsCounter;
 import pl.kania.trendminer.util.ProgressLogger;
 
 import java.util.Iterator;
