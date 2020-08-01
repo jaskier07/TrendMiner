@@ -61,16 +61,10 @@ public class CsvReader {
         tweet.setCreatedAt(parseDate(record.get("created_at")));
         tweet.setId(record.get("id"));
         tweet.setAuthor(record.get("user_screen_name"));
-        tweet.setContent(parseContent(record.get("text")));
+        tweet.setContent(record.get("text"));
         tweet.setLang(record.get("lang"));
         tweet.setLocation(record.get("user_location"));
         return tweet;
-    }
-
-    private String parseContent(String text) {
-        text = text.replaceAll("RT @(.*):", "");
-        text = text.replaceAll("@[^\\s]*", "");
-        return text;
     }
 
     private LocalDateTime parseDate(String value) {

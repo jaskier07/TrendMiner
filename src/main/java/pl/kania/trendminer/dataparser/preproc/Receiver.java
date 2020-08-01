@@ -31,8 +31,13 @@ public class Receiver {
         TweetAnalysisData tweetAnalysisData = new TweetProvider().getTweetsAndTweetAnalysisPeriod(environment.getProperty("pl.kania.path.dataset"));
         List<Tweet> tweets = tweetAnalysisData.getTweets();
         log.info("Tweets found: " + tweets.size());
+        performPreprocessing(tweets);
         filterOutNonEnglishTweets(tweets);
         return new TweetAnalysisData(tweets, tweetAnalysisData.getStart(), tweetAnalysisData.getEnd());
+    }
+
+    private void performPreprocessing(List<Tweet> tweets) {
+        tweets.forEach(t -> new TweetContentPreprocessor().performPreprocessing(t));
     }
 
     private void filterOutNonEnglishTweets(List<Tweet> tweets) {

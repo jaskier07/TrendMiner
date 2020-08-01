@@ -13,11 +13,9 @@ import java.util.StringTokenizer;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class TweetContentTokenizer {
 
-    private static final String DELIMITERS = "!\"#$%&\\'()*+,.:;<=>?@[]^_`{|}~ …”‘’“\r\n#";
+    private static final String DELIMITERS = "!\"$%&\\'()*+,.:;<=>?@[]^_`{|}~ …”‘’“\r\n#";
 
     public static List<String> tokenize(String content) {
-        content = replaceShortcuts(content);
-
         StringTokenizer tokenizer = new StringTokenizer(content, DELIMITERS);
         List<String> tokens = new ArrayList<>();
 
@@ -31,24 +29,6 @@ public class TweetContentTokenizer {
         }
 
         return tokens;
-    }
-
-    private static String replaceShortcuts(String content) {
-        content = content.toLowerCase();
-
-        content = content.replaceAll("’", "'");
-        content = content.replaceAll("what's", "what is ");
-        content = content.replaceAll("'s", " ");
-        content = content.replaceAll("'ve", " have ");
-        content = content.replaceAll("can't", "can not ");
-        content = content.replaceAll("n't", " not ");
-        content = content.replaceAll("i'm", "i am ");
-        content = content.replaceAll("'re", " are ");
-        content = content.replaceAll("'d", " would ");
-        content = content.replaceAll("'ll", " will ");
-        content = content.replaceAll("'scuse", " excuse ");
-
-        return content;
     }
 
     public static String[] tokenizeAndReturnArray(String content) {
