@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ShortcutReplacer {
 
-    public static String replaceShortcuts(String content) {
+    public static String replace(String content) {
         content = content.toLowerCase();
 
         content = content.replaceAll("’", "'");

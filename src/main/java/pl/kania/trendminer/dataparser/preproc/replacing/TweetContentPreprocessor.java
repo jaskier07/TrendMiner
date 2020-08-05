@@ -6,10 +6,11 @@ public class TweetContentPreprocessor {
 
     public void performPreprocessing(Tweet tweet) {
         String content = tweet.getContent();
-        content = MentionReplacer.removeMentions(content);
-        content = ShortcutReplacer.replaceShortcuts(content);
-        content = HashtagReplacer.replaceHashtags(content);
-        content = SpecialCharactersReplacer.replace(content);
+        content = MentionRemover.removeMentions(content);
+        content = ShortcutReplacer.replace(content);
+        content = HashtagReplacer.replace(content);
+        content = LinkRemover.remove(content);
+        content = SpecialCharactersRemover.remove(content);
         tweet.setContent(content);
     }
 }

@@ -21,7 +21,7 @@ public class HashtagReplacer {
 
     private static final Pattern pattern = Pattern.compile("#\\S+");
 
-    public static String replaceHashtags(String text) {
+    public static String replace(String text) {
         Matcher matcher = pattern.matcher(text);
         String newText = text;
 

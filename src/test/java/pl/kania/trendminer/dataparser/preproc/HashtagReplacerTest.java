@@ -20,7 +20,7 @@ class HashtagReplacerTest {
     })
     @DisplayName("Given text with hashtags replace them")
     public void givenTextContainingHashtagsThenSplitThemAndReplace(String text, String expected) {
-        String newText = HashtagReplacer.replaceHashtags(text);
+        String newText = HashtagReplacer.replace(text);
         assertEquals(expected, newText);
     }
 

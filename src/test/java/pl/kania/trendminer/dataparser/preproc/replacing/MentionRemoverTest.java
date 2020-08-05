@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-class MentionReplacerTest {
+class MentionRemoverTest {
 
     @CsvSource({
             "RT @Keemokazi1: I showed my mom how to get Corona virus and this is what happened \uD83D\uDE02\uD83D\uDE02 https://t.co/STTyxnj8xw,I showed my mom how to get Corona virus and this is what happened \uD83D\uDE02\uD83D\uDE02 https://t.co/STTyxnj8xw",
@@ -15,7 +15,7 @@ class MentionReplacerTest {
     })
     @ParameterizedTest
     void givenTweetContentRemoveResponseInformation(String text, String expected) {
-        String replacedText = MentionReplacer.removeMentions(text).trim();
+        String replacedText = MentionRemover.removeMentions(text).trim();
         Assertions.assertEquals(expected, replacedText);
     }
 }
