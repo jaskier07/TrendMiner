@@ -1,7 +1,10 @@
 package pl.kania.trendminer.dataparser.preproc.filtering;
 
+import lombok.Getter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.kania.trendminer.dataparser.Tweet;
+import pl.kania.trendminer.dataparser.input.location.EnglishSpeakingCountryDetector;
 
 @Service
 public class ValidEnglishWordThresholdProvider {
@@ -11,9 +14,20 @@ public class ValidEnglishWordThresholdProvider {
     private static final int MEDIUM_THRESHOLD = 80;
     private static final int HIGH_THRESHOLD = 90;
 
+    private EnglishSpeakingCountryDetector detector;
+    @Getter
+    private static int tweetsWithLocation = 0;
+
+    public ValidEnglishWordThresholdProvider(@Autowired EnglishSpeakingCountryDetector englishSpeakingCountryDetector) {
+        this.detector = englishSpeakingCountryDetector;
+    }
+
     public int getThresholdInPercentage(Tweet tweet) {
         boolean languageEn = tweet.getLang().equals(EN);
         boolean englishSpeakingCountry = isEnglishSpeakingCountry(tweet.getLocation());
+        if (englishSpeakingCountry) {
+            tweetsWithLocation++;
+        }
         if (languageEn && englishSpeakingCountry) {
             return LOW_THRESHOLD;
         } else if (languageEn || englishSpeakingCountry) {
@@ -23,7 +37,6 @@ public class ValidEnglishWordThresholdProvider {
     }
 
     private boolean isEnglishSpeakingCountry(String location) {
-        // TOOD
-        return false;
+        return detector.isInEnglishSpeakingCountry(location);
     }
 }

@@ -62,5 +62,8 @@ public class Receiver {
 
         double percentageOfRemovedTweets = 100 * (1. - ((double) tweets.size() / tweetsBeforeFilteringOut));
         log.info("Done filtering non-English tweets. % of removed tweets: " + percentageOfRemovedTweets);
+
+        int tweetsWithLocation = ValidEnglishWordThresholdProvider.getTweetsWithLocation();
+        log.info("Percentage of tweets with location: " + 100 * (1. - ((double)tweetsWithLocation / tweetsBeforeFilteringOut)));
     }
 }
