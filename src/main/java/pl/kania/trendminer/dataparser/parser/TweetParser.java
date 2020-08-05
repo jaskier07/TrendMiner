@@ -11,13 +11,8 @@ import pl.kania.trendminer.dataparser.input.TweetAnalysisData;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -56,7 +51,7 @@ public class TweetParser {
         long counter = 0;
         for (Tweet tweet : tweetsInEnglish) {
             String[] sentences = openNlpProvider.divideIntoSentences(tweet.getContent());
-            List<String> stemmedWords = getStemmedWords(sentences);
+            List<String> stemmedWords = getLemmatizedWords(sentences);
 
             if (stemmedWords.size() > 1) {
                 try {
@@ -118,9 +113,6 @@ public class TweetParser {
         List<String> stemmedWords = new ArrayList<>();
 
         for (String sentence : sentences) {
-            if (sentence.startsWith("http")) {
-                continue;
-            }
             List<String> words = openNlpProvider.filterOutNonWordsAndNouns(sentence);
             for (String word : words) {
                 if (!wordToOmit(word)) {
@@ -132,6 +124,20 @@ public class TweetParser {
             }
         }
         return stemmedWords;
+    }
+
+    private List<String> getLemmatizedWords(String[] sentences) {
+        List<String> newWords = new ArrayList<>();
+
+        Arrays.stream(sentences).forEach(sentence -> {
+            List<String> words = openNlpProvider.lemmatizeSentence(sentence)
+                    .stream()
+                    .filter(w -> !wordToOmit(w))
+                    .collect(Collectors.toList());
+            newWords.addAll(words);
+        });
+
+        return newWords;
     }
 
     private boolean wordToOmit(String word) {

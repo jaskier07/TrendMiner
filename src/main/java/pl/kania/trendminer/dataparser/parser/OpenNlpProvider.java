@@ -1,6 +1,7 @@
 package pl.kania.trendminer.dataparser.parser;
 
 import lombok.extern.slf4j.Slf4j;
+import opennlp.tools.lemmatizer.DictionaryLemmatizer;
 import opennlp.tools.postag.POSModel;
 import opennlp.tools.postag.POSTagger;
 import opennlp.tools.postag.POSTaggerME;
@@ -16,15 +17,18 @@ import pl.kania.trendminer.dataparser.preproc.filtering.TweetContentTokenizer;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
 @Service
 public class OpenNlpProvider {
 
+    public static final String UNKNOWN_LEMMA = "O";
     private SentenceDetectorME sentenceDetector;
     private POSTagger posTagger;
     private Stemmer stemmer;
+    private DictionaryLemmatizer dictionaryLemmatizer;
     private Environment environment;
 
     public OpenNlpProvider(@Autowired Environment environment) {
@@ -56,6 +60,26 @@ public class OpenNlpProvider {
         return stemmer.stem(word).toString();
     }
 
+    public List<String> lemmatizeSentence(String sentence) {
+        String[] tokens = TweetContentTokenizer.tokenizeAndReturnArray(sentence);
+        String[] tags = posTagger.tag(tokens);
+        String[] lemmas = dictionaryLemmatizer.lemmatize(tokens, tags);
+        List<String> words = new ArrayList<>();
+
+        for (int i = 0; i < lemmas.length; i++) {
+            if (isNounOrVerb(tags[i])) {
+                if (lemmas[i].equals(UNKNOWN_LEMMA)) {
+                    String stemmedWord = stemWord(tokens[i]);
+                    words.add(stemmedWord);
+                } else {
+                    words.add(lemmas[i]);
+                }
+            }
+        }
+
+        return words;
+    }
+
     private boolean isNounOrVerb(String tag) {
         return isNoun(tag) || isVerb(tag);
     }
@@ -83,6 +107,12 @@ public class OpenNlpProvider {
             posTagger = new POSTaggerME(posModel);
         } catch (IOException e) {
             log.error("Cannot load file containing English word mappings to part-of-speech.");
+        }
+
+        try (InputStream is = getClass().getResourceAsStream(environment.getProperty("pl.kania.path.model.lemmatizer"))) {
+            dictionaryLemmatizer = new DictionaryLemmatizer(is);
+        } catch (IOException e) {
+            log.error("Cannot load file containing English lemmatization mappings");
         }
 
         stemmer = new PorterStemmer();
