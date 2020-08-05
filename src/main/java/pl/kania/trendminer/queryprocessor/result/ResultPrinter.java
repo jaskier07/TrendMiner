@@ -1,10 +1,11 @@
-package pl.kania.trendminer.queryprocessor;
+package pl.kania.trendminer.queryprocessor.result;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import pl.kania.trendminer.queryprocessor.cluster.model.Cluster;
 import pl.kania.trendminer.queryprocessor.cluster.model.ClusterSize;
+import pl.kania.trendminer.queryprocessor.cluster.model.ClusterSizeComparator;
 
 import java.util.Comparator;
 import java.util.List;
@@ -29,6 +30,7 @@ public class ResultPrinter {
                     .map(Map.Entry::getValue)
                     .skip(minClusterSize - 2)
                     .collect(Collectors.toList());
+
             int size = minClusterSize;
             for (List<Cluster> cluster : clusters) {
                 if (!cluster.isEmpty()) {
@@ -40,9 +42,12 @@ public class ResultPrinter {
     }
 
     public static void printResults(List<Cluster> trendingClusters) {
+        new SubsetsRemoval().removeSubsets(trendingClusters);
+        trendingClusters.sort(new ClusterSizeComparator());
+
         log.info("Trending clusters:");
         trendingClusters.forEach(t -> {
-            if (t.getSize().ordinal() > 1) {
+            if (t.getSize().ordinal() > 0) {
                 log.info(t.toString() + ", " + t.getBurstiness());
             }
         });
