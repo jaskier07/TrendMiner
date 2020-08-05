@@ -40,7 +40,11 @@ public class Dao {
             WordCooccurrence cooccurrenceEntry = entry.getKey();
             Word word1 = getWord(cooccurrenceEntry.getWord1());
             Word word2 = getWord(cooccurrenceEntry.getWord2());
-            saveCooccurrence(timeID, word1, word2, cooccurrenceEntry.getSupport());
+            if (!word1.getWord().equals(word2.getWord())) {
+                saveCooccurrence(timeID, word1, word2, cooccurrenceEntry.getSupport());
+            } else {
+                log.debug("Words in cooccurrence are the same! " + word1);
+            }
         }
 
         log.info("Done saving word cooccurrences. Saved " + cooccurrenceCountPerDocument.size() + " records.");
