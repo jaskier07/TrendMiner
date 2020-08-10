@@ -36,6 +36,7 @@ public class TwoWordClusterGenerator {
         Map<CooccurrenceAllPeriods, Double> supportPerCooccurrenceInAllPeriods = sumSupportForWordCooccurrenceInAllPeriods(cooccurrencesPerTimeId);
         setSupportForWordCooccurrences(totalFrequency, supportPerCooccurrenceInAllPeriods);
 
+
         Set<CooccurrenceAllPeriods> allCooccurrencesWithSupport = supportPerCooccurrenceInAllPeriods.keySet();
         Set<CooccurrenceAllPeriods> cooccurrencesMeetingThreshold = new HashSet<>();
         allCooccurrencesWithSupport.stream()
@@ -54,11 +55,8 @@ public class TwoWordClusterGenerator {
 
     private Map<CooccurrenceAllPeriods, Double> sumSupportForWordCooccurrenceInAllPeriods(Map<TimeId, List<Cooccurrence>> cooccurrencesPerTimeId) {
         Map<CooccurrenceAllPeriods, Double> supportPerCooccurrenceInAllPeriods = new HashMap<>();
-        cooccurrencesPerTimeId.values().forEach(list -> {
-            list.forEach(cooccurrence -> {
-                supportPerCooccurrenceInAllPeriods.merge(new CooccurrenceAllPeriods(cooccurrence), cooccurrence.getSupport(), Double::sum);
-            });
-        });
+        cooccurrencesPerTimeId.values().forEach(list -> list.forEach(cooccurrence ->
+                supportPerCooccurrenceInAllPeriods.merge(new CooccurrenceAllPeriods(cooccurrence), cooccurrence.getSupport(), Double::sum)));
         return supportPerCooccurrenceInAllPeriods;
     }
     

@@ -43,8 +43,13 @@ public class Cooccurrence {
     private TimeId timeID;
 
     public Cooccurrence(Word word1, Word word2, TimeId timeID, Double support) {
-        this.word1=  word1;
-        this.word2 = word2;
+        if (word1.compareTo(word2) > 0) {
+            this.word1 = word2;
+            this.word2 = word1;
+        } else {
+            this.word1 = word1;
+            this.word2 = word2;
+        }
         this.timeID = timeID;
         this.support = support;
     }

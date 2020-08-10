@@ -36,6 +36,6 @@ public class Word implements Comparable<Word> {
         } else if (word == null) {
             return 1;
         }
-        return word.compareTo(other.getWord());
+        return getId() > other.getId() ? 1 : -1;
     }
 }

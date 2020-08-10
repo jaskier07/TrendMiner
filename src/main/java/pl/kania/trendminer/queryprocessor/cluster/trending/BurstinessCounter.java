@@ -6,6 +6,7 @@ import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import pl.kania.trendminer.dataparser.parser.WordCooccurrence;
 import pl.kania.trendminer.model.TimeId;
+import pl.kania.trendminer.model.Word;
 import pl.kania.trendminer.queryprocessor.cluster.model.Cluster;
 import pl.kania.trendminer.util.ProgressLogger;
 
@@ -26,10 +27,10 @@ public class BurstinessCounter {
             double minFrequencyInPeriod = Double.MAX_VALUE;
 
             for (int i = 0; i < cluster.getWords().size(); i++) {
-                String word1 = cluster.getWords().get(i);
+                Word word1 = cluster.getWords().get(i);
                 for (int j = i; j < cluster.getWords().size(); j++) {
-                    String word2 = cluster.getWords().get(j);
-                    WordCooccurrence cooccurrence = new WordCooccurrence(word1, word2);
+                    Word word2 = cluster.getWords().get(j);
+                    WordCooccurrence cooccurrence = new WordCooccurrence(word1.getWord(), word2.getWord());
                     Double frequency = supportPerTimeId.getValue().get(cooccurrence);
                     if (frequency == null) {
 //                        log.warn("lack of cooccurrence: " + cooccurrence.toString() + ", timeid=" + supportPerTimeId.getKey().toString());
