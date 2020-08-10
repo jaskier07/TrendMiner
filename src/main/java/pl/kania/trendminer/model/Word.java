@@ -1,5 +1,6 @@
 package pl.kania.trendminer.model;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -10,6 +11,7 @@ import javax.persistence.Id;
 
 @Getter
 @NoArgsConstructor
+@EqualsAndHashCode(of = "word")
 @Entity
 public class Word implements Comparable<Word> {
 
