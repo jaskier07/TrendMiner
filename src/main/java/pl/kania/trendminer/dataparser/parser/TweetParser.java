@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 @Component
 public class TweetParser {
 
-    private static final String[] WORDS_TO_OMIT = {"is", "a", "an", "the", "i", "we", "you", "rt"};
+    private static final String[] WORDS_TO_OMIT = {"is", "a", "an", "the", "i", "we", "you", "rt", "have"};
 
     private OpenNlpProvider openNlpProvider;
     private Dao dao;
