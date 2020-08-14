@@ -12,12 +12,7 @@ import pl.kania.trendminer.queryprocessor.SupportComputer;
 import pl.kania.trendminer.queryprocessor.cluster.model.Cluster;
 import pl.kania.trendminer.queryprocessor.cluster.model.ClusterSize;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -31,11 +26,11 @@ public class TwoWordClusterGenerator {
         this.supportComputer = new SupportComputer(Double.parseDouble(environment.getProperty("pl.kania.time.threshold-support")));
     }
 
-    public Result createTwoWordClusters(Map<TimeId, List<Cooccurrence>> cooccurrencesPerTimeId, Long totalFrequency) {
+    public Result createTwoWordClusters(Map<TimeId, List<Cooccurrence>> cooccurrencesPerTimeId, List<TimeId> timeIds) {
         log.info("Starting creating two word clusters...");
-        Map<CooccurrenceAllPeriods, Double> supportPerCooccurrenceInAllPeriods = sumSupportForWordCooccurrenceInAllPeriods(cooccurrencesPerTimeId);
+        Long totalFrequency = getTotalFrequency(timeIds);
+        Map<CooccurrenceAllPeriods, Double> supportPerCooccurrenceInAllPeriods = sumSupportForWordCooccurrenceInAllPeriods(cooccurrencesPerTimeId, timeIds);
         setSupportForWordCooccurrences(totalFrequency, supportPerCooccurrenceInAllPeriods);
-
 
         Set<CooccurrenceAllPeriods> allCooccurrencesWithSupport = supportPerCooccurrenceInAllPeriods.keySet();
         Set<CooccurrenceAllPeriods> cooccurrencesMeetingThreshold = new HashSet<>();
@@ -53,16 +48,32 @@ public class TwoWordClusterGenerator {
         supportPerCooccurrenceInAllPeriods.forEach((cooccurrence, supportSum) -> cooccurrence.setSupport(supportSum / totalFrequency));
     }
 
-    private Map<CooccurrenceAllPeriods, Double> sumSupportForWordCooccurrenceInAllPeriods(Map<TimeId, List<Cooccurrence>> cooccurrencesPerTimeId) {
+    private Map<CooccurrenceAllPeriods, Double> sumSupportForWordCooccurrenceInAllPeriods(Map<TimeId, List<Cooccurrence>> cooccurrencesPerTimeId, List<TimeId> timeIds) {
         Map<CooccurrenceAllPeriods, Double> supportPerCooccurrenceInAllPeriods = new HashMap<>();
-        cooccurrencesPerTimeId.values().forEach(list -> list.forEach(cooccurrence ->
-                supportPerCooccurrenceInAllPeriods.merge(new CooccurrenceAllPeriods(cooccurrence), cooccurrence.getSupport(), Double::sum)));
+        Map<Long, Long> docsProcessedPerTimeId = getDocumentsProcessed(timeIds);
+        cooccurrencesPerTimeId.values().forEach(list -> list.forEach(cooccurrence -> {
+            Long documentsProcessed = docsProcessedPerTimeId.get(cooccurrence.getTimeID().getId());
+            supportPerCooccurrenceInAllPeriods.merge(new CooccurrenceAllPeriods(cooccurrence), cooccurrence.getSupport() * documentsProcessed, Double::sum);
+        }));
         return supportPerCooccurrenceInAllPeriods;
     }
-    
+
+    private Map<Long, Long> getDocumentsProcessed(List<TimeId> timeIds) {
+        Map<Long, Long> map = new HashMap<>();
+        timeIds.forEach(t -> map.put(t.getId(), t.getDocFreq()));
+        return map;
+    }
+
+    private Long getTotalFrequency(List<TimeId> timeIds) {
+        return timeIds.stream()
+                .map(TimeId::getDocFreq)
+                .reduce(Long::sum)
+                .orElseThrow();
+    }
+
     @Value
     public static class Result {
-         List<Cluster> clusters;
-         Set<CooccurrenceAllPeriods> cooccurrences;
-    } 
+        List<Cluster> clusters;
+        Set<CooccurrenceAllPeriods> cooccurrences;
+    }
 }

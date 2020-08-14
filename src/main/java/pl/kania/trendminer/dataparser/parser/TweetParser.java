@@ -41,9 +41,15 @@ public class TweetParser {
         List<AnalysedPeriod> periods = PeriodGenerator.generate(tweetAnalysisData.getStart(), tweetAnalysisData.getEnd(), periodDuration);
 
         fillCooccurrenceTables(tweetsInEnglish, periods);
-        periods.forEach(this::setSupportValuesAndDropUncommonCooccurrences);
+        setSupportValues(periods);
 
         periods.forEach(p -> dao.saveTimePeriod(p));
+    }
+
+    private void setSupportValues(List<AnalysedPeriod> periods) {
+        log.info("Setting support values...");
+        periods.forEach(this::setSupportValuesAndDropUncommonCooccurrences);
+        ProgressLogger.done();
     }
 
     private void fillCooccurrenceTables(List<Tweet> tweetsInEnglish, List<AnalysedPeriod> periods) {
@@ -63,7 +69,7 @@ public class TweetParser {
                     log.error("Cannot find period", e);
                 }
             }
-            ProgressLogger.log(counter++, 1000);
+            ProgressLogger.log(counter++, 3000);
         }
         ProgressLogger.done();
 
@@ -76,7 +82,7 @@ public class TweetParser {
     }
 
     private void setSupportValuesAndDropUncommonCooccurrences(AnalysedPeriod period) {
-        log.info("Setting support values...");
+        long index = 0;
         Iterator<Map.Entry<WordCooccurrence, Long>> iterator = period.getCooccurrenceCountPerDocument().entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<WordCooccurrence, Long> entry = iterator.next();
@@ -90,6 +96,7 @@ public class TweetParser {
                 wordCooccurrence.setSupport(support);
                 log.debug("Preserved word cooccurrence " + wordCooccurrence.toString() + " with support = " + support);
             }
+            ProgressLogger.log(index++, 10000);
         }
         log.debug("Done setting support values. Preserved word cooccurrences: " + period.getCooccurrenceCountPerDocument().size());
     }
@@ -109,7 +116,6 @@ public class TweetParser {
     }
 
     private List<String> getStemmedWords(String[] sentences) {
-        // FIXME - not stem words that are own names if poor results
         List<String> stemmedWords = new ArrayList<>();
 
         for (String sentence : sentences) {

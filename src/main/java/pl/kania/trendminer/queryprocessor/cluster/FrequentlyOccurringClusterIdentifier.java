@@ -40,9 +40,7 @@ public class FrequentlyOccurringClusterIdentifier {
         Map<TimeId, List<Cooccurrence>> allCooccurrencesPerId = new HashMap<>();
         timeIds.forEach(t -> allCooccurrencesPerId.put(t, getAllCooccurrencesByTimeId(t)));
 
-        Long totalFrequency = getTotalFrequency(timeIds);
-
-        TwoWordClusterGenerator.Result clusterGeneratorResult = twoWordClusterGenerator.createTwoWordClusters(allCooccurrencesPerId, totalFrequency);
+        TwoWordClusterGenerator.Result clusterGeneratorResult = twoWordClusterGenerator.createTwoWordClusters(allCooccurrencesPerId, timeIds);
         List<Cluster> twoWordClusters = clusterGeneratorResult.getClusters();
 
         Map<ClusterSize, List<Cluster>> wordClusters = new ClusterGenerator(clusterGeneratorResult.getCooccurrences(), thresholdSupport)
@@ -55,12 +53,5 @@ public class FrequentlyOccurringClusterIdentifier {
 
     private List<Cooccurrence> getAllCooccurrencesByTimeId(TimeId t) {
         return cooccurrenceDao.findAllByTimeIDId(t.getId());
-    }
-
-    private Long getTotalFrequency(List<TimeId> timeIds) {
-        return timeIds.stream()
-                .map(TimeId::getDocFreq)
-                .reduce(Long::sum)
-                .orElseThrow();
     }
 }
