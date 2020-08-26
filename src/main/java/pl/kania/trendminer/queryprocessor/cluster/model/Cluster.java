@@ -1,11 +1,10 @@
 package pl.kania.trendminer.queryprocessor.cluster.model;
 
 import lombok.Data;
+import pl.kania.trendminer.model.Cooccurrence;
 import pl.kania.trendminer.model.Word;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 @Data
 public class Cluster {
@@ -36,5 +35,15 @@ public class Cluster {
 
     public int getIntSize() {
         return ClusterSize.getSize(size);
+    }
+
+    public Set<CooccurrenceAllPeriods> getAllPossibleCooccurrences() {
+        Set<CooccurrenceAllPeriods> cooccurrences = new HashSet<>();
+        for (int i = 0; i < words.size(); i++) {
+            for (int j = i + 1; j < words.size(); j++) {
+                cooccurrences.add(new CooccurrenceAllPeriods(words.get(i), words.get(j)));
+            }
+        }
+        return cooccurrences;
     }
 }

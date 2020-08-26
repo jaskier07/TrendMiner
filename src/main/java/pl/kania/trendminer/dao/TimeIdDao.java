@@ -6,6 +6,7 @@ import pl.kania.trendminer.model.TimeId;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public interface TimeIDDao extends JpaRepository<TimeId, Long> {
-    List<TimeId> findByStartTimeAfterAndEndTimeBefore(LocalDateTime startTime, LocalDateTime endTime);
+public interface TimeIdDao extends JpaRepository<TimeId, Long> {
+
+    List<TimeId> findAllByStartTimeAfterAndEndTimeBefore(LocalDateTime startTime, LocalDateTime endTime);
 }

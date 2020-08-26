@@ -16,10 +16,10 @@ import java.util.Map;
 public class Dao {
 
     private CooccurrenceDao cooccurrenceDao;
-    private TimeIDDao timeIDDao;
+    private TimeIdDao timeIDDao;
     private WordDao wordDao;
 
-    public Dao(@Autowired CooccurrenceDao cooccurrenceDao, @Autowired TimeIDDao timeIDDao, @Autowired WordDao wordDao) {
+    public Dao(@Autowired CooccurrenceDao cooccurrenceDao, @Autowired TimeIdDao timeIDDao, @Autowired WordDao wordDao) {
         this.cooccurrenceDao = cooccurrenceDao;
         this.timeIDDao = timeIDDao;
         this.wordDao = wordDao;

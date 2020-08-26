@@ -1,5 +1,6 @@
 package pl.kania.trendminer.model;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,7 +13,8 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Entity
-public class TimeId {
+@EqualsAndHashCode(of = "id")
+public class TimeId  {
 
     @Id
     @GeneratedValue
