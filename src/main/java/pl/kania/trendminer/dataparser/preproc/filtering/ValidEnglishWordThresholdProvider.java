@@ -14,7 +14,7 @@ public class ValidEnglishWordThresholdProvider {
     private static final int MEDIUM_THRESHOLD = 70;
     private static final int HIGH_THRESHOLD = 90;
 
-    private EnglishSpeakingCountryDetector detector;
+    private final EnglishSpeakingCountryDetector detector;
     @Getter
     private static int tweetsWithLocation = 0;
 

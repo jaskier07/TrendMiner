@@ -12,7 +12,6 @@ import pl.kania.trendminer.dataparser.input.TweetAnalysisData;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -22,15 +21,18 @@ public class TweetParser {
     private final Dao dao;
     private final Environment environment;
     private final WordProcessing wordProcessing;
+    private final ImproveResults improveResults;
 
-    public TweetParser(@Autowired Dao dao, @Autowired Environment environment, @Autowired OpenNlpProvider openNlpProvider) {
+    public TweetParser(@Autowired Dao dao, @Autowired Environment environment, @Autowired OpenNlpProvider openNlpProvider,
+                       @Autowired ImproveResults improveResults) {
         this.openNlpProvider = openNlpProvider;
         this.dao = dao;
         this.environment = environment;
-        this.wordProcessing = new WordProcessing(openNlpProvider, Integer.parseInt(environment.getProperty("pl.kania.min-word-length")));
+        this.improveResults = improveResults;
+        this.wordProcessing = new WordProcessing(openNlpProvider, Integer.parseInt(environment.getProperty("pl.kania.min-word-length")), improveResults.get());
     }
 
-    public void parseWordsFromTweetsAndFillCooccurrenceTable(TweetAnalysisData tweetAnalysisData) {
+    public void parseWordsInTweetsAndSave(TweetAnalysisData tweetAnalysisData) {
         List<AnalysedPeriod> periods = PeriodGenerator.generate(tweetAnalysisData.getStart(), tweetAnalysisData.getEnd(), getDuration());
 
         fillCooccurrenceTables(tweetAnalysisData.getTweets(), periods);
@@ -56,7 +58,7 @@ public class TweetParser {
         long counter = 0;
         for (Tweet tweet : tweetsInEnglish) {
             String[] sentences = openNlpProvider.divideIntoSentences(tweet.getContent());
-            List<String> stemmedWords = wordProcessing.getStemmedWords(sentences);//getLemmatizedWords(sentences);
+            List<String> stemmedWords = wordProcessing.perform(sentences);
 
             if (stemmedWords.size() > 1) {
                 try {
@@ -68,7 +70,7 @@ public class TweetParser {
                     log.error("Cannot find period", e);
                 }
             }
-            ProgressLogger.log(counter++, 5000);
+            ProgressLogger.log(counter++, 20000);
         }
 
         Integer allCooccurrences = periods.stream()
@@ -94,7 +96,7 @@ public class TweetParser {
                 wordCooccurrence.setSupport(support);
                 log.debug("Preserved word cooccurrence " + wordCooccurrence.toString() + " with support = " + support);
             }
-            ProgressLogger.log(index++, 10000);
+            ProgressLogger.log(index++, 20000);
         }
         log.debug("Done setting support values. Preserved word cooccurrences: " + period.getCooccurrenceCountPerDocument().size());
     }

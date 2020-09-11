@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import pl.kania.trendminer.dataparser.Tweet;
 import pl.kania.trendminer.dataparser.input.CsvReader;
 import pl.kania.trendminer.dataparser.input.TweetAnalysisData;
+import pl.kania.trendminer.dataparser.parser.ImproveResults;
 import pl.kania.trendminer.dataparser.preproc.replacing.TweetContentPreprocessor;
 import pl.kania.trendminer.dataparser.preproc.filtering.ValidEnglishWordThresholdProvider;
 import pl.kania.trendminer.dataparser.preproc.filtering.ValidEnglishWordsCounter;
@@ -23,12 +24,14 @@ public class Receiver {
     private final ValidEnglishWordsCounter validEnglishWordsCounter;
     private final ValidEnglishWordThresholdProvider validEnglishWordThresholdProvider;
     private final Environment environment;
+    private final ImproveResults improveResults;
 
     public Receiver(@Autowired ValidEnglishWordsCounter validEnglishWordsCounter, @Autowired ValidEnglishWordThresholdProvider validEnglishWordThresholdProvider,
-                    @Autowired Environment environment) {
+                    @Autowired Environment environment, @Autowired ImproveResults improveResults) {
         this.validEnglishWordsCounter = validEnglishWordsCounter;
         this.validEnglishWordThresholdProvider = validEnglishWordThresholdProvider;
         this.environment = environment;
+        this.improveResults = improveResults;
     }
 
     public TweetAnalysisData getTweetsInEnglish() {
@@ -40,7 +43,7 @@ public class Receiver {
     }
 
     private void performPreprocessing(List<Tweet> tweets) {
-        tweets.forEach(t -> new TweetContentPreprocessor().performPreprocessing(t));
+        tweets.forEach(t -> new TweetContentPreprocessor().performPreprocessing(t, improveResults.get()));
     }
 
     private void filterOutNonEnglishTweets(List<Tweet> tweets) {

@@ -17,7 +17,7 @@ import java.util.Set;
 public class EnglishDictionaryFile implements Dictionary {
 
     private final Set<String> dictionary;
-    private Environment environment;
+    private final Environment environment;
 
     public EnglishDictionaryFile(@Autowired Environment environment) {
         dictionary = new HashSet<>();
@@ -35,7 +35,6 @@ public class EnglishDictionaryFile implements Dictionary {
 
     private void initDictionary() {
         try {
-            // TODO find more representative dict
             dictionary.addAll(Files.readAllLines(getPathToDict()));
         } catch (IOException e) {
             log.error("Error reading file with English words", e);
