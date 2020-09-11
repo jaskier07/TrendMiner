@@ -40,6 +40,6 @@ public class Word implements Comparable<Word> {
         } else if (word == null) {
             return 1;
         }
-        return getId() > other.getId() ? 1 : -1;
+        return getWord().compareTo(other.getWord());
     }
 }

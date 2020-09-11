@@ -59,7 +59,7 @@ public class Receiver {
             ProgressLogger.log(counter++);
         }
 
-        ProgressLogger.done("Filtering non-English tweets. % of removed tweets: " +
+        ProgressLogger.done("Filtering non-English tweets. % of preserved tweets: " +
                 NumberFormatter.formatPercentage(tweets.size(), tweetsBeforeFilteringOut));
         log.info("Percentage of tweets with location: " + NumberFormatter.formatPercentage(
                 ValidEnglishWordThresholdProvider.getTweetsWithLocation(), tweetsBeforeFilteringOut));

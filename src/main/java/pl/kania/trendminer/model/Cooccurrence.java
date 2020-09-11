@@ -1,5 +1,6 @@
 package pl.kania.trendminer.model;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -7,6 +8,7 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.util.List;
 
+@EqualsAndHashCode
 @Setter
 @Getter
 @NoArgsConstructor
@@ -65,36 +67,8 @@ public class Cooccurrence {
         return (long)(support * periodFrequency);
     }
 
-    public boolean equals(final Object o) {
-        if (o == this) return true;
-        if (!(o instanceof Cooccurrence)) return false;
-        final Cooccurrence other = (Cooccurrence) o;
-        if (!other.canEqual((Object) this)) return false;
-        final Object this$word1 = this.getWord1();
-        final Object other$word1 = other.getWord1();
-        if (this$word1 == null ? other$word1 != null : !this$word1.equals(other$word1)) return false;
-        final Object this$word2 = this.getWord2();
-        final Object other$word2 = other.getWord2();
-        if (this$word2 == null ? other$word2 != null : !this$word2.equals(other$word2)) return false;
-        final Object this$timeID = this.getTimeID();
-        final Object other$timeID = other.getTimeID();
-        if (this$timeID == null ? other$timeID != null : !this$timeID.equals(other$timeID)) return false;
-        return true;
-    }
-
     protected boolean canEqual(final Object other) {
         return other instanceof Cooccurrence;
     }
 
-    public int hashCode() {
-        final int PRIME = 59;
-        int result = 1;
-        final Object $word1 = this.getWord1();
-        result = result * PRIME + ($word1 == null ? 43 : $word1.hashCode());
-        final Object $word2 = this.getWord2();
-        result = result * PRIME + ($word2 == null ? 43 : $word2.hashCode());
-        final Object $timeID = this.getTimeID();
-        result = result * PRIME + ($timeID == null ? 43 : $timeID.hashCode());
-        return result;
-    }
 }

@@ -36,7 +36,7 @@ public class TweetParser {
         fillCooccurrenceTables(tweetAnalysisData.getTweets(), periods);
         setSupportValues(periods);
 
-        periods.forEach(dao::saveTimePeriod);
+        dao.saveAllPeriods(periods);
     }
 
     private Duration getDuration() {
