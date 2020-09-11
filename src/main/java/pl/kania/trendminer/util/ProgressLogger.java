@@ -19,4 +19,8 @@ public class ProgressLogger {
     public static void done() {
         System.out.println("Done.");
     }
+
+    public static void done(String text) {
+        System.out.println("Done: " + text);
+    }
 }

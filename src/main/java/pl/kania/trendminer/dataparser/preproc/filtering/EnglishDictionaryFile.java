@@ -13,13 +13,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Slf4j
-@Service
-public class EnglishDictionary implements Dictionary {
+@Service("file")
+public class EnglishDictionaryFile implements Dictionary {
 
     private final Set<String> dictionary;
     private Environment environment;
 
-    public EnglishDictionary(@Autowired Environment environment) {
+    public EnglishDictionaryFile(@Autowired Environment environment) {
         dictionary = new HashSet<>();
         this.environment = environment;
         initDictionary();

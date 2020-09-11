@@ -10,7 +10,7 @@ import java.util.List;
 
 @Value
 public class TweetAnalysisData {
-    private List<Tweet> tweets;
-    private LocalDateTime start;
-    private LocalDateTime end;
+    List<Tweet> tweets;
+    LocalDateTime start;
+    LocalDateTime end;
 }

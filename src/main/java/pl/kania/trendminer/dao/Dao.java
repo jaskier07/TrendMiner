@@ -15,9 +15,9 @@ import java.util.Map;
 @Service
 public class Dao {
 
-    private CooccurrenceDao cooccurrenceDao;
-    private TimeIdDao timeIDDao;
-    private WordDao wordDao;
+    private final CooccurrenceDao cooccurrenceDao;
+    private final TimeIdDao timeIDDao;
+    private final WordDao wordDao;
 
     public Dao(@Autowired CooccurrenceDao cooccurrenceDao, @Autowired TimeIdDao timeIDDao, @Autowired WordDao wordDao) {
         this.cooccurrenceDao = cooccurrenceDao;
@@ -58,5 +58,13 @@ public class Dao {
 
     private Word getWord(String word) {
         return wordDao.findFirstByWordEquals(word).orElseGet(() -> wordDao.save(new Word(word)));
+    }
+
+    public void deleteAll() {
+        log.info("Removing existing records...");
+        cooccurrenceDao.deleteAll();
+        timeIDDao.deleteAll();
+        wordDao.deleteAll();
+        log.info("Done.");
     }
 }

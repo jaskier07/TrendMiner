@@ -32,23 +32,24 @@ public class CsvReader {
         List<Tweet> tweets = new ArrayList<>();
 
         try (InputStream is = getClass().getResourceAsStream(path);
-             InputStreamReader input = new InputStreamReader(is)
+             InputStreamReader input = new InputStreamReader(is);
+             CSVParser csvParser = CSVFormat.EXCEL.withFirstRecordAsHeader().parse(input);
         ) {
             log.info("File is being read...");
-            CSVParser csvParser = CSVFormat.EXCEL.withFirstRecordAsHeader().parse(input);
+
             for (CSVRecord record : csvParser) {
                 try {
                     Tweet tweet = getTweetFromRecord(record);
                     tweets.add(tweet);
 
                     ProgressLogger.log(record.getRecordNumber());
+                } catch (DateTimeParseException d) {
+                    log.warn("Wrong date format");
                 } catch (Exception e) {
                     log.warn("Problem with reading record. Record number: " + record.getRecordNumber(), e);
                 }
             }
-            ProgressLogger.done();
-
-            log.info("Finished reading file.");
+            ProgressLogger.done("Reading file. Tweets found: " + tweets.size());
             return new TweetAnalysisData(tweets, startTime, endTime);
         } catch (IOException e) {
             log.error("Cannot find csv containing tweets", e);
@@ -71,18 +72,13 @@ public class CsvReader {
         if (Strings.isBlank(value)) {
             return null;
         }
-        try {
-            LocalDateTime date = LocalDateTime.from(dtf.parse(value));
-            if (date.isBefore(startTime)) {
-                startTime = date;
-            }
-            if (date.isAfter(endTime)) {
-                endTime = date;
-            }
-            return date;
-        } catch (DateTimeParseException e) {
-            log.error("Cannot parse date: " + value, e);
-            return null;
+        LocalDateTime date = LocalDateTime.from(dtf.parse(value));
+        if (date.isBefore(startTime)) {
+            startTime = date;
         }
+        if (date.isAfter(endTime)) {
+            endTime = date;
+        }
+        return date;
     }
 }
