@@ -32,8 +32,11 @@ public class TimeId  {
     @Column(name = "DOC_FREQ")
     private Long docFreq;
 
+    @Column(name = "PERIOD_INDEX")
+    private int index;
+
     @Override
     public String toString() {
-        return "[" + (startTime == null ? "?" : startTime.toString()) + ", " + (endTime == null ? "?" : endTime.toString()) + "]";
+        return "#" + index + " [" + (startTime == null ? "?" : startTime.toString()) + ", " + (endTime == null ? "?" : endTime.toString()) + "]";
     }
 }

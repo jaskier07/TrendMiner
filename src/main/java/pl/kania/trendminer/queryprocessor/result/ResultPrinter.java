@@ -3,10 +3,12 @@ package pl.kania.trendminer.queryprocessor.result;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import pl.kania.trendminer.dataparser.parser.ImproveResults;
 import pl.kania.trendminer.queryprocessor.cluster.model.Cluster;
 import pl.kania.trendminer.queryprocessor.cluster.model.ClusterSize;
 import pl.kania.trendminer.queryprocessor.cluster.model.ClusterSizeComparator;
 import pl.kania.trendminer.queryprocessor.cluster.trending.TrendingClusterResult;
+import pl.kania.trendminer.util.Counter;
 
 import java.util.Comparator;
 import java.util.List;
@@ -17,12 +19,12 @@ import java.util.stream.Collectors;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ResultPrinter {
 
-    public static void sortAndPrintResults(List<TrendingClusterResult> results) {
+    public static void sortAndPrintResults(List<TrendingClusterResult> results, boolean improveResults) {
         List<Cluster> clusters = results.stream()
                 .peek(c -> c.getCluster().setBurstiness(c.getBurstiness()))
                 .map(TrendingClusterResult::getCluster)
                 .collect(Collectors.toList());
-        printResults(clusters);
+        printResults(clusters, improveResults);
     }
 
     public static void printResults(Map<ClusterSize, List<Cluster>> wordClustersPerSize) {
@@ -50,15 +52,20 @@ public class ResultPrinter {
         }
     }
 
-    public static void printResults(List<Cluster> trendingClusters) {
-        new SubsetsRemoval().removeSubsets(trendingClusters);
+    public static void printResults(List<Cluster> trendingClusters, boolean improveResults) {
+        if (improveResults) {
+            new SubsetsRemoval().removeSubsets(trendingClusters);
+        }
         trendingClusters.sort(Comparator.comparing(Cluster::getBurstiness).reversed());
+        trendingClusters = trendingClusters.stream()
+                .filter(c -> c.getSize().ordinal() > ClusterSize.TWO.ordinal())
+                .limit(50)
+                .collect(Collectors.toList());
 
-        log.info("Trending clusters:");
+        log.info("\n\nTrending clusters:");
+        Counter ctr = new Counter();
         trendingClusters.forEach(t -> {
-            if (t.getSize().ordinal() > 0) {
-                log.info(t.toString() + ", " + t.getBurstiness());
-            }
+            log.info("#" + ctr.getValueAsStringAndIncrement() + ": " + t.getBurstiness() + " : " + t.toString() + "");
         });
     }
 }

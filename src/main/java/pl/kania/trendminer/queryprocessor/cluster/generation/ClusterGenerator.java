@@ -6,9 +6,11 @@ import pl.kania.trendminer.queryprocessor.cluster.model.CooccurrenceAllPeriods;
 import pl.kania.trendminer.queryprocessor.SupportComputer;
 import pl.kania.trendminer.queryprocessor.cluster.model.Cluster;
 import pl.kania.trendminer.queryprocessor.cluster.model.ClusterSize;
+import pl.kania.trendminer.util.NumberFormatter;
 import pl.kania.trendminer.util.ProgressLogger;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -16,12 +18,14 @@ public class ClusterGenerator {
 
     private final Map<CooccurrenceAllPeriods, CooccurrenceAllPeriods> cooccurrences;
     private final SupportComputer supportComputer;
+    private final int maxClusterSize;
 
-    public ClusterGenerator(Set<CooccurrenceAllPeriods> cooccurrences, double thresholdSupport) {
+    public ClusterGenerator(Set<CooccurrenceAllPeriods> cooccurrences, double thresholdSupport, int maxClusterSize) {
         this.supportComputer = new SupportComputer(thresholdSupport);
+        this.maxClusterSize = maxClusterSize;
         this.cooccurrences = cooccurrences
                 .stream()
-                .collect(Collectors.toMap(c -> c, c -> c));
+                .collect(Collectors.toMap(Function.identity(), Function.identity()));
     }
 
     public Map<ClusterSize, List<Cluster>> generateLargerWordClusters(List<Cluster> twoWordClusters) {
@@ -32,12 +36,13 @@ public class ClusterGenerator {
         long counter = 0;
         long totalCounter = 0;
         log.info("Generating larger world clusters started.");
-        for (ClusterSize clusterSize = ClusterSize.TWO; !wordClustersPerSize.get(clusterSize).isEmpty(); clusterSize = ClusterSize.next(clusterSize)) {
+
+        for (ClusterSize clusterSize = ClusterSize.TWO; !wordClustersPerSize.get(clusterSize).isEmpty() &&
+                clusterSize.ordinal() < maxClusterSize - 1; clusterSize = ClusterSize.next(clusterSize)) {
             Set<Cluster> nextWordClusters = new HashSet<>();
             ClusterSize nextClusterSize = ClusterSize.next(clusterSize);
 
             for (int j = 0; j < wordClustersPerSize.get(clusterSize).size(); j++) {
-                // FIXME start from k = j + 1?
                 for (int k = 0; k < wordClustersPerSize.get(clusterSize).size(); k++) {
                     if (j != k) {
                         Cluster cluster1 = wordClustersPerSize.get(clusterSize).get(j);
@@ -52,11 +57,11 @@ public class ClusterGenerator {
                         }
                     }
                 }
-                ProgressLogger.log(counter++, 20000);
+                ProgressLogger.log(counter++, 5000);
             }
             ProgressLogger.done();
             log.info("Generating " + ClusterSize.getSize(nextClusterSize) + "-clusters ended. Generated " + nextWordClusters.size() + " clusters.");
-            log.warn("Percentage of omitted words: " + (100 * (double) notPresentCounter / totalCounter));
+            log.warn("Percentage of omitted words: " + NumberFormatter.formatPercentage(notPresentCounter, totalCounter));
 
             wordClustersPerSize.put(nextClusterSize, List.of(nextWordClusters.toArray(new Cluster[0])));
         }
@@ -93,7 +98,6 @@ public class ClusterGenerator {
     }
 
     private boolean clustersHaveCommonWords(Cluster cluster1, Cluster cluster2, ClusterSize clusterSize) {
-        // FIXME -1 - 1
         for (int n = 0; n < ClusterSize.getSize(clusterSize) - 1; n++) {
             Word wordCluster1 = cluster1.getWords().get(n);
             Word wordCluster2 = cluster2.getWords().get(n);

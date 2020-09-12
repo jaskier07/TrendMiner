@@ -14,11 +14,11 @@ public class WordCooccurrence {
 
     public WordCooccurrence(String word1, String word2) {
         if (word1.compareTo(word2) < 0) {
-            this.word1 = word1;
-            this.word2 = word2;
+            this.word1 = word1.toLowerCase();
+            this.word2 = word2.toLowerCase();
         } else {
-            this.word1 = word2;
-            this.word2 = word1;
+            this.word1 = word2.toLowerCase();
+            this.word2 = word1.toLowerCase();
         }
     }
 

@@ -32,13 +32,13 @@ public class TweetParser {
         this.wordProcessing = new WordProcessing(openNlpProvider, Integer.parseInt(environment.getProperty("pl.kania.min-word-length")), improveResults.get());
     }
 
-    public void parseWordsInTweetsAndSave(TweetAnalysisData tweetAnalysisData) {
+    public List<AnalysedPeriod> parseWordsInTweetsAndFillPeriods(TweetAnalysisData tweetAnalysisData) {
         List<AnalysedPeriod> periods = PeriodGenerator.generate(tweetAnalysisData.getStart(), tweetAnalysisData.getEnd(), getDuration());
 
         fillCooccurrenceTables(tweetAnalysisData.getTweets(), periods);
         setSupportValues(periods);
 
-        dao.saveAllPeriods(periods);
+        return periods;
     }
 
     private Duration getDuration() {
@@ -62,7 +62,6 @@ public class TweetParser {
 
             if (stemmedWords.size() > 1) {
                 try {
-                    tweet.setStemmedWords(Set.copyOf(stemmedWords));
                     AnalysedPeriod currentPeriod = AnalysedPeriod.findPeriodForDate(periods, tweet.getCreatedAt());
                     currentPeriod.incrementDocumentCount();
                     addWordsToCooccurrenceMap(stemmedWords, currentPeriod);
@@ -82,7 +81,6 @@ public class TweetParser {
     }
 
     private void setSupportValuesAndDropUncommonCooccurrences(AnalysedPeriod period) {
-        long index = 0;
         Iterator<Map.Entry<WordCooccurrence, Long>> iterator = period.getCooccurrenceCountPerDocument().entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<WordCooccurrence, Long> entry = iterator.next();
@@ -91,13 +89,13 @@ public class TweetParser {
 
             if (support < Double.parseDouble(environment.getProperty("pl.kania.support.min-threshold"))) {
                 iterator.remove();
-                log.debug("Dropped word cooccurrence: " + wordCooccurrence.toString() + " with support = " + support);
+//                log.debug("Dropped word cooccurrence: " + wordCooccurrence.toString() + " with support = " + support);
             } else {
                 wordCooccurrence.setSupport(support);
-                log.debug("Preserved word cooccurrence " + wordCooccurrence.toString() + " with support = " + support);
+//                log.debug("Preserved word cooccurrence " + wordCooccurrence.toString() + " with support = " + support);
             }
-            ProgressLogger.log(index++, 20000);
         }
+        ProgressLogger.log(1, 1);
         log.debug("Done setting support values. Preserved word cooccurrences: " + period.getCooccurrenceCountPerDocument().size());
     }
 
@@ -107,6 +105,8 @@ public class TweetParser {
         for (int i = 0; i < stemmedWords.size(); i++) {
             for (int j = i + 1; j < stemmedWords.size(); j++) {
                 WordCooccurrence wordCooccurrence = new WordCooccurrence(stemmedWords.get(i), stemmedWords.get(j));
+
+                // add word only once per document
                 if (!updatedWordCooccurrences.contains(wordCooccurrence)) {
                     period.getCooccurrenceCountPerDocument().merge(wordCooccurrence, 1L, Long::sum);
                     updatedWordCooccurrences.add(wordCooccurrence);

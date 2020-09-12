@@ -32,7 +32,7 @@ public class WordProcessing {
             for (String word : words) {
                 if (!wordToOmit(word)) {
                     String stemmedWord = openNlpProvider.stemWord(word).toLowerCase();
-                    if (stemmedWord.length() >= minWordLength) {
+                    if (stemmedWord.length() >= minWordLength && !stemmedWords.contains(stemmedWord)) {
                         stemmedWords.add(stemmedWord);
                     }
                 }
@@ -48,6 +48,7 @@ public class WordProcessing {
             List<String> words = openNlpProvider.lemmatizeSentence(sentence)
                     .stream()
                     .filter(w -> !wordToOmit(w))
+                    .distinct()
                     .collect(Collectors.toList());
             newWords.addAll(words);
         });

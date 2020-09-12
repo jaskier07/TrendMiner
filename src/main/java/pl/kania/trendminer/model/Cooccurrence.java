@@ -8,11 +8,11 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.util.List;
 
-@EqualsAndHashCode
 @Setter
 @Getter
 @NoArgsConstructor
 @Entity
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Cooccurrence {
 
     @Id
@@ -21,10 +21,12 @@ public class Cooccurrence {
 
     @ManyToOne
     @JoinColumn(name = "WORD_1_ID")
+    @EqualsAndHashCode.Include
     private Word word1;
 
     @ManyToOne
     @JoinColumn(name = "WORD_2_ID")
+    @EqualsAndHashCode.Include
     private Word word2;
 
     @Column(name = "SUPPORT")
@@ -32,6 +34,7 @@ public class Cooccurrence {
 
     @ManyToOne
     @JoinColumn(name = "TIME_ID")
+    @EqualsAndHashCode.Include
     private TimeId timeID;
 
     public Cooccurrence(Word word1, Word word2, TimeId timeID, Double support) {

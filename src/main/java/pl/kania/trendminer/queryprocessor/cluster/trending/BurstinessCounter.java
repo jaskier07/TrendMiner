@@ -22,6 +22,9 @@ public class BurstinessCounter {
     }
 
     private double getAverage(List<Double> frequencies) {
+        if (frequencies.isEmpty()) {
+            return 0;
+        }
         return frequencies.stream()
                 .reduce(Double::sum)
                 .orElseThrow(() -> new IllegalStateException("Error summing up average frequencies")) / frequencies.size();

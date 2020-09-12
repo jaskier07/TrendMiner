@@ -16,14 +16,13 @@ public class Tweet {
     private String location;
     private String content;
     private LocalDateTime createdAt;
-    private Set<String> stemmedWords = new HashSet<>();
 
     public Tweet(String id, String lang, String author, String location, String content, LocalDateTime createdAt) {
         this.id = id;
         this.lang = lang;
         this.author = author;
         this.location = location;
-        this.content = content;
+        this.content = content.toLowerCase();
         this.createdAt = createdAt;
     }
 

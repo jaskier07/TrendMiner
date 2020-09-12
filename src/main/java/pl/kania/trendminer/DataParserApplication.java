@@ -6,8 +6,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 import pl.kania.trendminer.dao.Dao;
 import pl.kania.trendminer.dataparser.input.TweetAnalysisData;
+import pl.kania.trendminer.dataparser.parser.AnalysedPeriod;
 import pl.kania.trendminer.dataparser.parser.TweetParser;
 import pl.kania.trendminer.dataparser.preproc.Receiver;
+import pl.kania.trendminer.util.TimeDifferenceCounter;
+
+import java.util.List;
 
 @Slf4j
 @SpringBootApplication
@@ -16,12 +20,20 @@ public class DataParserApplication {
 	public static void main(String[] args) {
 		ApplicationContext applicationContext = SpringApplication.run(DataParserApplication.class, args);
 
-		applicationContext.getBean(Dao.class).deleteAll();
+		TimeDifferenceCounter tdf = new TimeDifferenceCounter();
+		Dao dao = applicationContext.getBean(Dao.class);
+		dao.deleteAll();
+
+		tdf.start();
 
 		Receiver receiver = applicationContext.getBean(Receiver.class);
 		TweetAnalysisData tweetsInEnglish = receiver.getTweetsInEnglish();
-		applicationContext.getBean(TweetParser.class).parseWordsInTweetsAndSave(tweetsInEnglish);
+		List<AnalysedPeriod> periods = applicationContext.getBean(TweetParser.class).parseWordsInTweetsAndFillPeriods(tweetsInEnglish);
 
+		tdf.stop();
+		dao.saveAllPeriods(periods);
+
+		log.info(tdf.getDifference());
 		log.info("App finished.");
 	}
 
