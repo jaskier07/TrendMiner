@@ -1,7 +1,7 @@
 package pl.kania.trendminer.queryprocessor.cluster.generation;
 
 import lombok.extern.slf4j.Slf4j;
-import pl.kania.trendminer.model.Word;
+import pl.kania.trendminer.db.model.Word;
 import pl.kania.trendminer.queryprocessor.cluster.model.CooccurrenceAllPeriods;
 import pl.kania.trendminer.queryprocessor.SupportComputer;
 import pl.kania.trendminer.queryprocessor.cluster.model.Cluster;

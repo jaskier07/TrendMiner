@@ -12,12 +12,11 @@ import opennlp.tools.stemmer.Stemmer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
-import pl.kania.trendminer.dataparser.preproc.filtering.TweetContentTokenizer;
+import pl.kania.trendminer.dataparser.parser.preproc.filtering.TweetContentTokenizer;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Slf4j

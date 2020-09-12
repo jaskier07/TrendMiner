@@ -1,11 +1,6 @@
 package pl.kania.trendminer.queryprocessor.cluster.trending;
 
-import pl.kania.trendminer.model.TimeId;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class BurstinessCounter {
 

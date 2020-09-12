@@ -4,8 +4,8 @@ package pl.kania.trendminer.queryprocessor.cluster.trending;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.Value;
-import pl.kania.trendminer.model.Cooccurrence;
-import pl.kania.trendminer.model.TimeId;
+import pl.kania.trendminer.db.model.Cooccurrence;
+import pl.kania.trendminer.db.model.TimeId;
 import pl.kania.trendminer.queryprocessor.cluster.model.Cluster;
 
 import java.util.List;

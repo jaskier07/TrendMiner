@@ -4,11 +4,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
-import pl.kania.trendminer.dao.Dao;
+import pl.kania.trendminer.db.dao.DatabaseService;
 import pl.kania.trendminer.dataparser.input.TweetAnalysisData;
 import pl.kania.trendminer.dataparser.parser.AnalysedPeriod;
 import pl.kania.trendminer.dataparser.parser.TweetParser;
-import pl.kania.trendminer.dataparser.preproc.Receiver;
+import pl.kania.trendminer.dataparser.parser.preproc.Receiver;
 import pl.kania.trendminer.util.TimeDifferenceCounter;
 
 import java.util.List;
@@ -21,8 +21,8 @@ public class DataParserApplication {
 		ApplicationContext applicationContext = SpringApplication.run(DataParserApplication.class, args);
 
 		TimeDifferenceCounter tdf = new TimeDifferenceCounter();
-		Dao dao = applicationContext.getBean(Dao.class);
-		dao.deleteAll();
+		DatabaseService databaseService = applicationContext.getBean(DatabaseService.class);
+		databaseService.deleteAll();
 
 		tdf.start();
 
@@ -31,7 +31,7 @@ public class DataParserApplication {
 		List<AnalysedPeriod> periods = applicationContext.getBean(TweetParser.class).parseWordsInTweetsAndFillPeriods(tweetsInEnglish);
 
 		tdf.stop();
-		dao.saveAllPeriods(periods);
+		databaseService.saveAllPeriods(periods);
 
 		log.info(tdf.getDifference());
 		log.info("App finished.");

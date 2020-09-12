@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import pl.kania.trendminer.util.ProgressLogger;
-import pl.kania.trendminer.dao.Dao;
+import pl.kania.trendminer.db.dao.DatabaseService;
 import pl.kania.trendminer.dataparser.Tweet;
 import pl.kania.trendminer.dataparser.input.TweetAnalysisData;
 
@@ -18,15 +18,15 @@ import java.util.*;
 public class TweetParser {
 
     private final OpenNlpProvider openNlpProvider;
-    private final Dao dao;
+    private final DatabaseService databaseService;
     private final Environment environment;
     private final WordProcessing wordProcessing;
     private final ImproveResults improveResults;
 
-    public TweetParser(@Autowired Dao dao, @Autowired Environment environment, @Autowired OpenNlpProvider openNlpProvider,
+    public TweetParser(@Autowired DatabaseService databaseService, @Autowired Environment environment, @Autowired OpenNlpProvider openNlpProvider,
                        @Autowired ImproveResults improveResults) {
         this.openNlpProvider = openNlpProvider;
-        this.dao = dao;
+        this.databaseService = databaseService;
         this.environment = environment;
         this.improveResults = improveResults;
         this.wordProcessing = new WordProcessing(openNlpProvider, Integer.parseInt(environment.getProperty("pl.kania.min-word-length")), improveResults.get());

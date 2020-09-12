@@ -1,15 +1,12 @@
 package pl.kania.trendminer.queryprocessor.cluster.model;
 
-import org.assertj.core.util.Sets;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import pl.kania.trendminer.model.Word;
+import pl.kania.trendminer.db.model.Word;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class ClusterTest {
 

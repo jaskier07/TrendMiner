@@ -1,13 +1,10 @@
 package pl.kania.trendminer.queryprocessor.cluster.model;
 
-import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import lombok.Value;
-import pl.kania.trendminer.model.Cooccurrence;
-import pl.kania.trendminer.model.Word;
+import pl.kania.trendminer.db.model.Cooccurrence;
+import pl.kania.trendminer.db.model.Word;
 
 import java.util.List;
 import java.util.Objects;

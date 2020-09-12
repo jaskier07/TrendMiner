@@ -1,12 +1,10 @@
 package pl.kania.trendminer.queryprocessor;
 
 import lombok.Data;
-import lombok.Value;
-import pl.kania.trendminer.model.Cooccurrence;
-import pl.kania.trendminer.model.TimeId;
+import pl.kania.trendminer.db.model.Cooccurrence;
+import pl.kania.trendminer.db.model.TimeId;
 import pl.kania.trendminer.queryprocessor.cluster.model.CooccurrenceAllPeriods;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 

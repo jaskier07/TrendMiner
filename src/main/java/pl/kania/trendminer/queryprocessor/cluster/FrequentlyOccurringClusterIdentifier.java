@@ -10,9 +10,9 @@ import pl.kania.trendminer.queryprocessor.cluster.trending.TrendingClusterParame
 import pl.kania.trendminer.queryprocessor.cluster.trending.TrendingClusterResult;
 import pl.kania.trendminer.queryprocessor.result.ResultPrinter;
 import pl.kania.trendminer.queryprocessor.cluster.trending.TrendingClusterDetector;
-import pl.kania.trendminer.dao.CooccurrenceDao;
-import pl.kania.trendminer.model.Cooccurrence;
-import pl.kania.trendminer.model.TimeId;
+import pl.kania.trendminer.db.dao.CooccurrenceDao;
+import pl.kania.trendminer.db.model.Cooccurrence;
+import pl.kania.trendminer.db.model.TimeId;
 import pl.kania.trendminer.queryprocessor.cluster.generation.ClusterGenerator;
 import pl.kania.trendminer.queryprocessor.cluster.generation.TwoWordClusterGenerator;
 import pl.kania.trendminer.queryprocessor.cluster.model.Cluster;
