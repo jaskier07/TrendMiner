@@ -63,7 +63,7 @@ public class TimeIdProvider {
 
     public int getPeriodsBeforeUserStart() {
         return Long.valueOf(getAllTimeIds().stream()
-                .filter(p -> p.getStartTime().isBefore(start))
+                .filter(p -> p.getStartTime().isBefore(timeIdsInRange.get(0).getStartTime()))
                 .count())
                 .intValue();
     }

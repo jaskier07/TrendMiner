@@ -1,40 +1,62 @@
 package pl.kania.trendminer.queryprocessor.cluster.trending;
 
 
-import lombok.Getter;
-
 import java.util.ArrayList;
 import java.util.List;
 
 class AverageFrequency {
-    private List<Long> frequencies = new ArrayList<>();
-    private List<Double> averageFrequencies = new ArrayList<>();
+    private final List<Double> frequenciesBefore = new ArrayList<>();
+    private final List<Double> frequenciesAfter = new ArrayList<>();
+
+    private final List<Double> averageFrequenciesBefore = new ArrayList<>();
+    private final List<Double> averageFrequenciesAfter = new ArrayList<>();
+
+    private final int periodsBefore;
+
+    public AverageFrequency(int periodsBefore) {
+        this.periodsBefore = periodsBefore;
+    }
 
     void addFrequency(Long frequency) {
-        int periods = frequencies.size();
-
-        if (periods > 0) {
-            averageFrequencies.add(countAverage(periods));
+        if (frequenciesBefore.size() < periodsBefore) {
+            if (!frequenciesBefore.isEmpty()) {
+                averageFrequenciesBefore.add(countAverage(frequenciesBefore));
+            }
+            frequenciesBefore.add(frequency.doubleValue());
+        } else {
+            if (!frequenciesAfter.isEmpty()) {
+                averageFrequenciesAfter.add(countAverage(frequenciesAfter));
+            }
+            frequenciesAfter.add(frequency.doubleValue());
         }
-
-        frequencies.add(frequency);
     }
 
-    private double countAverage(int periods) {
-        double fraction = 1. / periods;
-        Long sum = sumFrequencies();
-        return fraction * sum;
-    }
-
-    List<Double> getAverage() {
-        List<Double> average = new ArrayList<>(averageFrequencies);
-        average.add(countAverage(frequencies.size()));
+    List<Double> getAverageBefore() {
+        if (averageFrequenciesBefore.isEmpty()) {
+            return List.of(1.);
+        }
+        List<Double> average = new ArrayList<>(averageFrequenciesBefore);
+        average.add(countAverage(frequenciesBefore));
         return average;
     }
 
-    private Long sumFrequencies() {
-        return frequencies.stream()
-                .reduce(Long::sum)
+    List<Double> getAverageAfter() {
+        List<Double> average = new ArrayList<>(averageFrequenciesAfter);
+        average.add(countAverage(frequenciesAfter));
+        return average;
+    }
+
+
+    private <T extends Number>double countAverage(List<T> elementsToCount) {
+        double fraction = 1. / elementsToCount.size();
+        Double sum = sumFrequencies(elementsToCount);
+        return fraction * sum;
+    }
+
+    private <T extends Number>Double sumFrequencies(List<T> elementsToCount) {
+        return elementsToCount.stream()
+                .map(T::doubleValue)
+                .reduce(Double::sum)
                 .orElseThrow(() -> new IllegalStateException("Error summing up frequencies"));
     }
 }

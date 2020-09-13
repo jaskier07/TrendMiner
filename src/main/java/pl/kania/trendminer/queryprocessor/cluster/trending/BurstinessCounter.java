@@ -4,11 +4,9 @@ import java.util.List;
 
 public class BurstinessCounter {
 
-    public double count(AverageFrequency averageFrequency, int periodsBeforeUserStart) {
-        List<Double> average = averageFrequency.getAverage();
-
-        double averageAfter = getAverage(average.subList(periodsBeforeUserStart, average.size()));
-        double averageBefore = getAverage(average.subList(0, periodsBeforeUserStart));
+    public double count(AverageFrequency averageFrequency) {
+        double averageAfter = getAverage(averageFrequency.getAverageAfter());
+        double averageBefore = getAverage(averageFrequency.getAverageBefore());
 
         if (averageBefore == 0.) {
             return averageAfter;

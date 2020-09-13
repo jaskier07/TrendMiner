@@ -5,7 +5,6 @@ import pl.kania.trendminer.db.model.Cooccurrence;
 import pl.kania.trendminer.db.model.TimeId;
 import pl.kania.trendminer.queryprocessor.SmallestFrequencyFinder;
 import pl.kania.trendminer.queryprocessor.cluster.model.Cluster;
-import pl.kania.trendminer.queryprocessor.cluster.model.ClusterSize;
 import pl.kania.trendminer.queryprocessor.cluster.model.CooccurrenceAllPeriods;
 
 import java.util.*;
@@ -16,11 +15,11 @@ public class TrendingClusterDetector {
 
     public List<TrendingClusterResult> detect(TrendingClusterParameters params) {
         List<TrendingClusterResult> results = new ArrayList<>();
-        List<TimeId> orderedTimeIds = getOrderedTimeIds(params);
+        List<TimeId> orderedTimeIdsAsc = getOrderedTimeIdsByStartTimeAscending(params);
 
         params.getWordClusters().forEach(cluster -> {
-            AverageFrequency averageFrequency = getAverageFrequency(params, orderedTimeIds, cluster);
-            double burstiness = new BurstinessCounter().count(averageFrequency, params.getPeriodsBeforeUserStart());
+            AverageFrequency averageFrequency = getAverageFrequency(params, orderedTimeIdsAsc, cluster);
+            double burstiness = new BurstinessCounter().count(averageFrequency);
             if (burstiness > params.getThresholdBurstiness()) {
                 results.add(new TrendingClusterResult(cluster, burstiness));
             }
@@ -35,7 +34,7 @@ public class TrendingClusterDetector {
      * Generates all possible word cooccurrences and in each period finds the smallest frequency value.
      */
     private AverageFrequency getAverageFrequency(TrendingClusterParameters params, List<TimeId> orderedTimeIds, Cluster cluster) {
-        AverageFrequency averageFrequency = new AverageFrequency();
+        AverageFrequency averageFrequency = new AverageFrequency(params.getPeriodsBeforeUserStart());
         orderedTimeIds.forEach(timeId -> {
             Set<CooccurrenceAllPeriods> allPossibleCooccurrences = cluster.getAllPossibleCooccurrences();
             allPossibleCooccurrences.forEach(c -> {
@@ -49,7 +48,7 @@ public class TrendingClusterDetector {
         return averageFrequency;
     }
 
-    private List<TimeId> getOrderedTimeIds(TrendingClusterParameters params) {
+    private List<TimeId> getOrderedTimeIdsByStartTimeAscending(TrendingClusterParameters params) {
         return params.getAllCooccurrencesPerTimeId().keySet().stream()
                 .sorted(Comparator.comparing(TimeId::getStartTime))
                 .collect(Collectors.toList());
