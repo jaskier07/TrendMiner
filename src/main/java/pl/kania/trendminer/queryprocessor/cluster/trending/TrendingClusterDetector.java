@@ -5,6 +5,7 @@ import pl.kania.trendminer.db.model.Cooccurrence;
 import pl.kania.trendminer.db.model.TimeId;
 import pl.kania.trendminer.queryprocessor.SmallestFrequencyFinder;
 import pl.kania.trendminer.queryprocessor.cluster.model.Cluster;
+import pl.kania.trendminer.queryprocessor.cluster.model.ClusterSize;
 import pl.kania.trendminer.queryprocessor.cluster.model.CooccurrenceAllPeriods;
 
 import java.util.*;
@@ -30,6 +31,9 @@ public class TrendingClusterDetector {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Generates all possible word cooccurrences and in each period finds the smallest frequency value.
+     */
     private AverageFrequency getAverageFrequency(TrendingClusterParameters params, List<TimeId> orderedTimeIds, Cluster cluster) {
         AverageFrequency averageFrequency = new AverageFrequency();
         orderedTimeIds.forEach(timeId -> {
@@ -38,7 +42,8 @@ public class TrendingClusterDetector {
                 Cooccurrence cooccurrence = params.getAllCooccurrencesPerTimeId().get(timeId).get(new Cooccurrence(c.getWord1(), c.getWord2(), timeId));
                 c.setSupport(cooccurrence == null ? 0. : cooccurrence.getSupport());
             });
-            long estimatedFrequency = new SmallestFrequencyFinder().findInTimeId(allPossibleCooccurrences, timeId, params.getAllCooccurrencesPerTimeId());
+
+            long estimatedFrequency = new SmallestFrequencyFinder().findInTimeId(allPossibleCooccurrences, timeId, params.getAllCooccurrencesPerTimeId().get(timeId));
             averageFrequency.addFrequency(estimatedFrequency);
         });
         return averageFrequency;

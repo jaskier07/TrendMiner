@@ -38,7 +38,7 @@ public class ClusterGenerator {
         log.info("Generating larger world clusters started.");
 
         for (ClusterSize clusterSize = ClusterSize.TWO; !wordClustersPerSize.get(clusterSize).isEmpty() &&
-                clusterSize.ordinal() < maxClusterSize - 1; clusterSize = ClusterSize.next(clusterSize)) {
+                clusterSize.ordinal() < maxClusterSize - 1 - 1; clusterSize = ClusterSize.next(clusterSize)) {
             Set<Cluster> nextWordClusters = new HashSet<>();
             ClusterSize nextClusterSize = ClusterSize.next(clusterSize);
 

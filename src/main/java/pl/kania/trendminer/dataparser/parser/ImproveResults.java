@@ -13,7 +13,7 @@ public class ImproveResults {
     private final boolean value;
 
     public ImproveResults(@Autowired Environment env) {
-        value = Boolean.parseBoolean(env.getProperty("pl.kania.improve-results"));
+        value = Boolean.parseBoolean(env.getProperty("pl.kania.path.dataset"));
     }
 
     public boolean get() {

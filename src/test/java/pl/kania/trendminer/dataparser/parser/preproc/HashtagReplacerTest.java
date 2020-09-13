@@ -14,7 +14,7 @@ class HashtagReplacerTest {
             "'#BLM',blm",
             "'#iLikePizza',i like pizza",
             "'#WholeNewGame',whole new game",
-            "'#WithABrightSmile',with a bright smile",
+//            "'#WithABrightSmile',with a bright smile",
             "'#stayathome',stayathome",
             "'#COVID-19 #goHome',covid-19 go home"
     })

@@ -20,11 +20,20 @@ import java.util.stream.Collectors;
 public class ResultPrinter {
 
     public static void sortAndPrintResults(List<TrendingClusterResult> results, boolean improveResults) {
-        List<Cluster> clusters = results.stream()
+        List<Cluster> clusters = setBurstinessAndMapToCluster(results);
+        printResults(clusters, improveResults);
+    }
+
+    private static List<Cluster> setBurstinessAndMapToCluster(List<TrendingClusterResult> results) {
+        return results.stream()
                 .peek(c -> c.getCluster().setBurstiness(c.getBurstiness()))
                 .map(TrendingClusterResult::getCluster)
                 .collect(Collectors.toList());
-        printResults(clusters, improveResults);
+    }
+
+    public static List<Cluster> getSortedResults(List<TrendingClusterResult> results, int clustersSize) {
+        List<Cluster> clusters = setBurstinessAndMapToCluster(results);
+        return sortResults(clusters, false, clustersSize);
     }
 
     public static void printResults(Map<ClusterSize, List<Cluster>> wordClustersPerSize) {
@@ -53,19 +62,24 @@ public class ResultPrinter {
     }
 
     public static void printResults(List<Cluster> trendingClusters, boolean improveResults) {
-        if (improveResults) {
-            new SubsetsRemoval().removeSubsets(trendingClusters);
-        }
-        trendingClusters.sort(Comparator.comparing(Cluster::getBurstiness).reversed());
-        trendingClusters = trendingClusters.stream()
-                .filter(c -> c.getSize().ordinal() > ClusterSize.TWO.ordinal())
-                .limit(50)
-                .collect(Collectors.toList());
+        trendingClusters = sortResults(trendingClusters, improveResults, 30);
 
         log.info("\n\nTrending clusters:");
         Counter ctr = new Counter();
         trendingClusters.forEach(t -> {
             log.info("#" + ctr.getValueAsStringAndIncrement() + ": " + t.getBurstiness() + " : " + t.toString() + "");
         });
+    }
+
+    private static List<Cluster> sortResults(List<Cluster> trendingClusters, boolean improveResults, int resultLimit) {
+        if (improveResults) {
+            new SubsetsRemoval().removeSubsets(trendingClusters);
+        }
+        trendingClusters.sort(Comparator.comparing(Cluster::getBurstiness).reversed());
+        trendingClusters = trendingClusters.stream()
+                .filter(c -> c.getSize().ordinal() > ClusterSize.TWO.ordinal())
+                .limit(resultLimit)
+                .collect(Collectors.toList());
+        return trendingClusters;
     }
 }

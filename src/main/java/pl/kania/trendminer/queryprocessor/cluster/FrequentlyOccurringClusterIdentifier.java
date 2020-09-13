@@ -33,30 +33,24 @@ public class FrequentlyOccurringClusterIdentifier {
     private final CooccurrenceDao cooccurrenceDao;
     private final TwoWordClusterGenerator twoWordClusterGenerator;
     private final TrendingClusterDetector trendingClusterDetector;
-    private final TimeIdProvider timeIdProvider;
     private final double thresholdSupport;
     private final double thresholdBurstiness;
-    private final ImproveResults improveResults;
     private final int maxClusterSize;
     private final TimeDifferenceCounter tdc = new TimeDifferenceCounter();
 
     public FrequentlyOccurringClusterIdentifier(@Autowired CooccurrenceDao cooccurrenceDao,
                                                 @Autowired Environment environment,
                                                 @Autowired TwoWordClusterGenerator twoWordClusterGenerator,
-                                                @Autowired TrendingClusterDetector trendingClusterDetector,
-                                                @Autowired TimeIdProvider timeIdProvider,
-                                                @Autowired ImproveResults improveResults) {
+                                                @Autowired TrendingClusterDetector trendingClusterDetector) {
         this.twoWordClusterGenerator = twoWordClusterGenerator;
         this.cooccurrenceDao = cooccurrenceDao;
         this.trendingClusterDetector = trendingClusterDetector;
-        this.timeIdProvider = timeIdProvider;
         this.thresholdSupport = Double.parseDouble(environment.getProperty("pl.kania.time.threshold-support"));
         this.thresholdBurstiness = Double.parseDouble(environment.getProperty("pl.kania.time.threshold-burstiness"));
-        this.improveResults = improveResults;
         this.maxClusterSize = Integer.parseInt(environment.getProperty("pl.kania.max-cluster-size"));
     }
 
-    public void identify() {
+    public List<TrendingClusterResult> identify(TimeIdProvider timeIdProvider) {
         Map<TimeId, List<Cooccurrence>> occurrencesInRangePerId = getCooccurrencesPerTimeId(timeIdProvider.getTimeIdsInRange());
 
         TwoWordClusterGenerator.Result clusterGeneratorResult = twoWordClusterGenerator.createTwoWordClusters(occurrencesInRangePerId, timeIdProvider.getTimeIdsInRange());
@@ -64,28 +58,29 @@ public class FrequentlyOccurringClusterIdentifier {
 
         Map<ClusterSize, List<Cluster>> wordClusters = new ClusterGenerator(clusterGeneratorResult.getCooccurrences(), thresholdSupport, maxClusterSize)
                 .generateLargerWordClusters(twoWordClusters);
-//        ResultPrinter.printResults(wordClusters);
 
         TrendingClusterParameters params = TrendingClusterParameters.builder()
-                .allCooccurrencesPerTimeId(getAllCooccurrencesPerId())
+                .allCooccurrencesPerTimeId(getAllCooccurrencesPerId(timeIdProvider))
                 .thresholdBurstiness(thresholdBurstiness)
                 .wordClusters(mergeClustersFromMap(wordClusters))
                 .periodsBeforeUserStart(timeIdProvider.getPeriodsBeforeUserStart())
                 .build();
         List<TrendingClusterResult> results = trendingClusterDetector.detect(params);
         tdc.stop();
-        ResultPrinter.sortAndPrintResults(results, improveResults.get());
-
         log.info(tdc.getDifference());
+
+        return results;
     }
 
     private List<Cluster> mergeClustersFromMap(Map<ClusterSize, List<Cluster>> wordClusters) {
         List<Cluster> clusters = new ArrayList<>();
         wordClusters.values().forEach(clusters::addAll);
-        return clusters;
+        return clusters.stream()
+                .filter(c -> ClusterSize.getSize(c.getSize()) > 2)
+                .collect(Collectors.toList());
     }
 
-    private Map<TimeId, Map<Cooccurrence, Cooccurrence>> getAllCooccurrencesPerId() {
+    private Map<TimeId, Map<Cooccurrence, Cooccurrence>> getAllCooccurrencesPerId(TimeIdProvider timeIdProvider) {
         Map<TimeId, Map<Cooccurrence, Cooccurrence>> cooccurrencesPerTimedId = new HashMap<>();
 
         tdc.start();

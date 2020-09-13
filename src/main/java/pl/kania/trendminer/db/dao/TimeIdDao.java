@@ -10,7 +10,7 @@ public interface TimeIdDao extends JpaRepository<TimeId, Long> {
 
     List<TimeId> findAllByStartTimeAfterAndEndTimeBefore(LocalDateTime startTime, LocalDateTime endTime);
 
-    List<TimeId> findAllByIndexGreaterThan(int index);
+    List<TimeId> findAllByIndexGreaterThanAndIndexLessThan(int greater, int lower);
 
     List<TimeId> findAllByIndex(int index);
 }

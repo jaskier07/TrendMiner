@@ -22,29 +22,28 @@ public class TweetParser {
     private final Environment environment;
     private final WordProcessing wordProcessing;
     private final ImproveResults improveResults;
+    private final DurationProvider durationProvider;
 
-    public TweetParser(@Autowired DatabaseService databaseService, @Autowired Environment environment, @Autowired OpenNlpProvider openNlpProvider,
-                       @Autowired ImproveResults improveResults) {
+    public TweetParser(@Autowired DatabaseService databaseService,
+                       @Autowired Environment environment,
+                       @Autowired OpenNlpProvider openNlpProvider,
+                       @Autowired ImproveResults improveResults,
+                       @Autowired DurationProvider durationProvider) {
         this.openNlpProvider = openNlpProvider;
         this.databaseService = databaseService;
         this.environment = environment;
         this.improveResults = improveResults;
         this.wordProcessing = new WordProcessing(openNlpProvider, Integer.parseInt(environment.getProperty("pl.kania.min-word-length")), improveResults.get());
+        this.durationProvider = durationProvider;
     }
 
     public List<AnalysedPeriod> parseWordsInTweetsAndFillPeriods(TweetAnalysisData tweetAnalysisData) {
-        List<AnalysedPeriod> periods = PeriodGenerator.generate(tweetAnalysisData.getStart(), tweetAnalysisData.getEnd(), getDuration());
+        List<AnalysedPeriod> periods = PeriodGenerator.generate(tweetAnalysisData.getStart(), tweetAnalysisData.getEnd(), durationProvider.getDuration());
 
         fillCooccurrenceTables(tweetAnalysisData.getTweets(), periods);
         setSupportValues(periods);
 
         return periods;
-    }
-
-    private Duration getDuration() {
-        long periodStep = Long.parseLong(environment.getProperty("pl.kania.period-duration"));
-        int chronoUnitOrdinal = Integer.parseInt(environment.getProperty("pl.kania.period-duration.chrono-unit-ordinal"));
-        return Duration.of(periodStep, ChronoUnit.values()[chronoUnitOrdinal]);
     }
 
     private void setSupportValues(List<AnalysedPeriod> periods) {

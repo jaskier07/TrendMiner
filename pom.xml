@@ -15,6 +15,7 @@
 
     <properties>
         <java.version>13</java.version>
+        <start-class>pl.kania.trendminer.DataParserApplication</start-class>
     </properties>
 
     <dependencies>

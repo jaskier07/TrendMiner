@@ -10,9 +10,7 @@ import java.util.Set;
 
 public class SmallestFrequencyFinder {
 
-    public long findInTimeId(Set<CooccurrenceAllPeriods> clusterCooccurrences, TimeId timeId, Map<TimeId, Map<Cooccurrence, Cooccurrence>> allCooccurrencesPerTimeId) {
-        Map<Cooccurrence, Cooccurrence> cooccurrencesInTimeId = allCooccurrencesPerTimeId.get(timeId);
-
+    public long findInTimeId(Set<CooccurrenceAllPeriods> clusterCooccurrences, TimeId timeId, Map<Cooccurrence, Cooccurrence> cooccurrencesInTimeId) {
         final SmallestValue smallest = new SmallestValue();
         clusterCooccurrences.forEach(c -> {
             Cooccurrence cooccurrence = cooccurrencesInTimeId.get(new Cooccurrence(c.getWord1(), c.getWord2(), timeId));

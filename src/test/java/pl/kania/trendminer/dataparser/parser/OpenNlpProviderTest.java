@@ -7,13 +7,14 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
+import pl.kania.trendminer.QueryProcessorApplication;
 
 import java.util.stream.Stream;
 
-@SpringBootTest
+@SpringBootTest(classes = QueryProcessorApplication.class)
 class OpenNlpProviderTest {
 
-    private OpenNlpProvider openNlpProvider;
+    private final OpenNlpProvider openNlpProvider;
 
     public OpenNlpProviderTest(@Autowired OpenNlpProvider openNlpProvider) {
         this.openNlpProvider = openNlpProvider;
