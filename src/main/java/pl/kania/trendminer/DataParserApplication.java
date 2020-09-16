@@ -25,7 +25,6 @@ public class DataParserApplication {
 		databaseService.deleteAll();
 
 		tdf.start();
-
 		Receiver receiver = applicationContext.getBean(Receiver.class);
 		TweetAnalysisData tweetsInEnglish = receiver.getTweetsInEnglish();
 		List<AnalysedPeriod> periods = applicationContext.getBean(TweetParser.class).parseWordsInTweetsAndFillPeriods(tweetsInEnglish);
@@ -33,7 +32,7 @@ public class DataParserApplication {
 		tdf.stop();
 		databaseService.saveAllPeriods(periods);
 
-		log.info(tdf.getDifference());
+		log.info("Overall difference: " + tdf.getDifference());
 		log.info("App finished.");
 	}
 

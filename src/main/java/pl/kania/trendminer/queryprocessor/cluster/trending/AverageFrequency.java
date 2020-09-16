@@ -54,6 +54,9 @@ class AverageFrequency {
     }
 
     private <T extends Number>Double sumFrequencies(List<T> elementsToCount) {
+        if (elementsToCount.isEmpty()) {
+            return 0.;
+        }
         return elementsToCount.stream()
                 .map(T::doubleValue)
                 .reduce(Double::sum)

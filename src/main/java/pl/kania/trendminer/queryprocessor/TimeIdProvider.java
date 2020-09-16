@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -52,13 +53,21 @@ public class TimeIdProvider {
         this.start = periodFrom;
         this.end = periodTo;
 
-        timeIdsInRange.addAll(timeIdDao.findAllByIndex(index));
+        timeIdsInRange.addAll(timeIdDao.findAllByIndex(index).stream().sorted().collect(Collectors.toList()));
         allTimeIds.addAll(timeIdDao.findAllByIndexGreaterThanAndIndexLessThan(index - numPreviousPeriods - 1, index + 1));
 
         timeIdsInRange.stream()
                 .filter(t -> t.getIndex() == index)
                 .findFirst()
                 .ifPresent(p -> log.info("Chosen period: " + p.toString()));
+    }
+
+    public LocalDateTime getSelectedPeriodStart() {
+        return timeIdsInRange.get(0).getStartTime();
+    }
+
+    public LocalDateTime getSelectedPeriodEnd() {
+        return timeIdsInRange.get(timeIdsInRange.size() - 1).getEndTime();
     }
 
     public int getPeriodsBeforeUserStart() {

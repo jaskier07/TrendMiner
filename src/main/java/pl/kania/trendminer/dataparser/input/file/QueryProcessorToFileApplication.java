@@ -16,12 +16,15 @@ import pl.kania.trendminer.queryprocessor.cluster.FrequentlyOccurringClusterIden
 import pl.kania.trendminer.queryprocessor.cluster.model.Cluster;
 import pl.kania.trendminer.queryprocessor.cluster.trending.TrendingClusterResult;
 import pl.kania.trendminer.queryprocessor.result.ResultPrinter;
+import pl.kania.trendminer.util.AverageCounter;
 import pl.kania.trendminer.util.NumberFormatter;
+import pl.kania.trendminer.util.TimeDifferenceCounter;
 
 import java.io.FileInputStream;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,7 +41,6 @@ public class QueryProcessorToFileApplication {
         String pathToOutput = environment.getProperty("pl.kania.path.path-output");
         String datePattern = environment.getProperty("pl.kania.time.date-time-pattern");
         String from = environment.getProperty("pl.kania.time.period-from");
-        String to = environment.getProperty("pl.kania.time.period-to");
         int periodStartIndex = Integer.parseInt(environment.getProperty("pl.kania.time.file.period-index-start"));
         int periodStopIndex = Integer.parseInt(environment.getProperty("pl.kania.time.file.period-index-stop"));
         int previousPeriods = Integer.parseInt(environment.getProperty("pl.kania.time.previous-periods-to-analyse"));
@@ -49,7 +51,11 @@ public class QueryProcessorToFileApplication {
         LocalDateTime initialStart = LocalDateTime.from(dtf.parse(from));
         LocalDateTime start = initialStart;
 
+        List<Long> executionTimes = new ArrayList<>();
         for (int periodIndex = periodStartIndex; periodIndex < periodStopIndex; periodIndex++) {
+            TimeDifferenceCounter tdc = new TimeDifferenceCounter();
+            tdc.start();
+
             start = start.plus(durationProvider.getDuration());
             timeIdProvider.init(initialStart, start, periodIndex, previousPeriods);
 
@@ -58,7 +64,7 @@ public class QueryProcessorToFileApplication {
             List<Cluster> sortedResults = ResultPrinter.getSortedResults(results, 10);
 
             for (Cluster cluster : sortedResults) {
-                writer.appendText(periodIndex + "," + timeIdProvider.getStart() + "," + timeIdProvider.getEnd() + ","
+                writer.appendText(periodIndex + "," + timeIdProvider.getSelectedPeriodStart() + "," + timeIdProvider.getSelectedPeriodEnd() + ","
                         + NumberFormatter.format(cluster.getBurstiness(), 5) + ","
                         + cluster.getWords().stream().map(Word::getWord).collect(Collectors.joining(",")) + "\n");
             }
@@ -69,7 +75,12 @@ public class QueryProcessorToFileApplication {
                 initialStart = initialStart.plus(durationProvider.getDuration());
             }
 
+            tdc.stop();
+            executionTimes.add(tdc.getDifferenceInMillis());
         }
+        List<Double> doubleExecutionTime = executionTimes.stream().map(Long::doubleValue).collect(Collectors.toList());
+        log.info("Average: " + AverageCounter.count(doubleExecutionTime) / 1000 + " seconds");
+        log.info("Execution times: " + doubleExecutionTime.stream().map(Object::toString).collect(Collectors.joining(", ")));
 
         log.info("Writing to file...");
         writer.write();
